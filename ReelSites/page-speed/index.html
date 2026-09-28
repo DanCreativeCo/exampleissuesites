@@ -1,0 +1,434 @@
+<!DOCTYPE html>
+<html lang="en" class="blank foit">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Loblolly &amp; Lace Boutique</title>
+<style>
+  /* ============================================================
+     INTENTIONALLY BAD PAGE SPEED & LAYOUT SHIFT — DEMO ONLY
+     The design is fine. The way it loads is not (simulated with JS
+     so it plays out the same on every refresh, ~11 seconds):
+       - page hidden until a giant "render-blocking" script finishes
+       - that script freezes the tab (synchronous busy-wait)
+       - full-screen "Loading experience..." splash that sticks at 99%
+       - invisible text while the "web font" loads (FOIT, font-display: block)
+       - hero image has no width/height, so it pops in and shoves everything down
+       - images paint top-to-bottom, blurry, one at a time
+       - a sponsored banner injects above "Shop now" right as you tap it
+       - product photos with no reserved space push the grid around
+       - the carousel loads last and pushes the footer down again
+     ============================================================ */
+
+  *, *::before, *::after { box-sizing: border-box; }
+
+  :root {
+    --cream: #f8f2ea;
+    --linen: #fffaf4;
+    --pine: #2f4a3a;
+    --blush: #e9b8a8;
+    --clay: #b8643f;
+    --mustard: #d9a441;
+    --ink: #2a2420;
+    --muted: #7a6d62;
+    --line: #eadfd2;
+  }
+
+  html { background: #fff; }
+  body {
+    margin: 0;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    background: var(--cream);
+    color: var(--ink);
+  }
+  h1, h2, h3, .logo { font-family: "Didot", "Bodoni 72", Georgia, "Times New Roman", serif; }
+
+  .wrap { max-width: 1120px; margin: 0 auto; padding-inline: clamp(16px, 5vw, 48px); }
+
+  /* ---------- Header ---------- */
+  .topbar { background: var(--linen); border-bottom: 1px solid var(--line); }
+  .topbar .wrap { display: flex; align-items: center; gap: 24px; min-height: 64px; }
+  .logo { font-size: 22px; font-weight: bold; color: var(--pine); margin-right: auto; }
+  .logo span { color: var(--clay); font-style: italic; }
+  .nav { display: flex; gap: 22px; }
+  .nav a { color: var(--ink); text-decoration: none; }
+  .bag { color: var(--pine); font-weight: bold; text-decoration: none; white-space: nowrap; }
+  @media (max-width: 640px) { .nav { display: none; } }
+
+  /* ---------- Hero ---------- */
+  .hero { padding: 20px 0 48px; }
+  .hero-img {
+    border-radius: 20px; overflow: hidden; aspect-ratio: 16 / 9;
+    background: #efe2d6;
+  }
+  .hero-img svg { display: block; width: 100%; height: 100%; }
+  .hero-copy { padding-top: 24px; }
+  .eyebrow { text-transform: uppercase; letter-spacing: 2px; font-size: 13px; font-weight: bold; color: var(--clay); margin: 0 0 10px; }
+  .hero h1 { font-size: clamp(36px, 6vw, 60px); line-height: 1.05; margin: 0 0 14px; max-width: 18ch; }
+  .lede { font-size: clamp(16px, 2vw, 20px); line-height: 1.5; color: var(--muted); max-width: 46ch; margin: 0 0 24px; }
+  .cta { display: flex; gap: 12px; flex-wrap: wrap; }
+  .btn {
+    display: inline-block; background: var(--pine); color: #fff; text-decoration: none;
+    padding: 15px 28px; border-radius: 999px; font-weight: bold; font-size: 17px; border: 0; cursor: pointer;
+  }
+  .btn.ghost { background: transparent; color: var(--pine); box-shadow: inset 0 0 0 2px var(--pine); }
+  @media (min-width: 800px) {
+    .hero-img { aspect-ratio: 4 / 1; }
+    .hero h1 { max-width: none; }
+    .lede { max-width: 62ch; }
+  }
+
+  /* ---------- Products ---------- */
+  .section { padding: 56px 0; }
+  .section h2 { font-size: clamp(28px, 4vw, 40px); margin: 0 0 6px; }
+  .sub { color: var(--muted); margin: 0 0 24px; line-height: 1.5; }
+  .grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px; }
+  @media (min-width: 800px) { .grid { grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 24px; } }
+  .card { background: var(--linen); border: 1px solid var(--line); border-radius: 16px; overflow: hidden; }
+  .pic { aspect-ratio: 4 / 5; background: #efe2d6; }
+  .art { width: 100%; height: 100%; display: grid; place-items: center; font-size: clamp(56px, 13vw, 104px); }
+  .info { padding: 12px 14px 16px; }
+  .info h3 { font-size: 17px; margin: 0 0 4px; }
+  .price { color: var(--clay); font-weight: bold; }
+  .p1 { background: linear-gradient(160deg, #f6d6ca, #e9a994); }
+  .p2 { background: linear-gradient(160deg, #cfdccf, #7f9f86); }
+  .p3 { background: linear-gradient(160deg, #f5e3bd, #d9a441); }
+  .p4 { background: linear-gradient(160deg, #e6cdb8, #9c6a4a); }
+  .p5 { background: linear-gradient(160deg, #d9e2ea, #8ea3b5); }
+  .p6 { background: linear-gradient(160deg, #f3d0d6, #c9727f); }
+
+  /* ---------- Lookbook carousel ---------- */
+  .lookbook { background: var(--pine); color: var(--linen); }
+  .lookbook .sub { color: #c9d6cc; }
+  .track {
+    display: flex; gap: 16px; overflow-x: auto; scroll-snap-type: x mandatory;
+    scrollbar-width: none; padding-bottom: 4px;
+  }
+  .track::-webkit-scrollbar { display: none; }
+  .slide {
+    flex: 0 0 min(78%, 340px); scroll-snap-align: start; aspect-ratio: 4 / 3; border-radius: 18px;
+    padding: 18px; display: flex; flex-direction: column; color: var(--ink);
+  }
+  .slide .em { font-size: 60px; margin-bottom: auto; }
+  .slide b { font-family: Georgia, serif; font-size: 22px; }
+  .slide span { font-size: 14px; color: #5b4f46; }
+  .s1 { background: linear-gradient(135deg, #f8e0a8, #e9b27a); }
+  .s2 { background: linear-gradient(135deg, #f3d6cb, #d98f7e); }
+  .s3 { background: linear-gradient(135deg, #d8e4d3, #93b39a); }
+  .s4 { background: linear-gradient(135deg, #f7ccb4, #e08e5f); }
+  .s5 { background: linear-gradient(135deg, #e0d7ee, #a894c9); }
+
+  /* ---------- Visit + footer ---------- */
+  .visit .wrap { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 28px; }
+  .visit h2 { font-size: 26px; margin: 0 0 10px; color: var(--pine); }
+  .visit p { margin: 0; line-height: 1.7; }
+  .visit a { color: var(--clay); font-weight: bold; }
+  footer { background: var(--ink); color: #bfb2a5; font-size: 14px; padding: 28px 0 70px; line-height: 1.5; }
+
+  /* ---------- Demo stopwatch (same in both files) ---------- */
+  .clock {
+    position: fixed; left: 12px; bottom: 12px; z-index: 1000; pointer-events: none;
+    font: 600 14px/1 ui-monospace, Menlo, Consolas, monospace; color: #fff;
+    background: rgba(20, 20, 20, .85); padding: 9px 13px; border-radius: 999px;
+  }
+
+  /* ============================================================
+     THE BAD STUFF
+     ============================================================ */
+
+  /* Nothing paints until the "render-blocking" bundle is done */
+  html.blank body { visibility: hidden; }
+
+  /* FOIT: text is invisible until the "web font" arrives */
+  html.foit .site * { color: transparent !important; }
+
+  /* Images have no reserved dimensions: they take up 0px until they "load" */
+  .hero-img, .pic { display: none; }
+  .hero-img.loaded, .pic.loaded { display: block; }
+  .scan { animation: scan 1.1s steps(7, end) both, sharpen 1.5s ease-out both; }
+  @keyframes scan { from { clip-path: inset(0 0 100% 0); } to { clip-path: inset(0 0 0 0); } }
+  @keyframes sharpen { from { filter: blur(12px) saturate(.3); } 70% { filter: blur(4px) saturate(.8); } to { filter: none; } }
+
+  /* Carousel isn't there at all until the very end */
+  .track { display: none; }
+  .track.loaded { display: flex; }
+  .wait { display: flex; align-items: center; gap: 10px; color: #c9d6cc; font-size: 15px; }
+  .wait[hidden] { display: none; }
+  .mini-spin { width: 18px; height: 18px; border-radius: 50%; border: 3px solid rgba(255,255,255,.25); border-top-color: #fff; animation: spin .8s linear infinite; }
+
+  /* Full-screen splash */
+  .splash {
+    position: fixed; inset: 0; z-index: 500; background: #fff; display: none;
+    flex-direction: column; align-items: center; justify-content: center; gap: 18px; color: #666; font-size: 15px;
+  }
+  .splash.show { display: flex; }
+  .splash .spinner { width: 58px; height: 58px; border-radius: 50%; border: 5px solid #eee; border-top-color: var(--pine); animation: spin .8s linear infinite; }
+  .splash .bar { width: min(260px, 70vw); height: 6px; background: #eee; border-radius: 6px; overflow: hidden; }
+  .splash .bar i { display: block; height: 100%; width: 0; background: var(--pine); transition: width .25s; }
+  .splash .pct { font: 13px ui-monospace, Menlo, Consolas, monospace; color: #aaa; }
+  @keyframes spin { to { transform: rotate(360deg); } }
+
+  /* The late ad that lands exactly where "Shop now" was */
+  .ad {
+    display: flex; align-items: center; gap: 12px; margin: 0 0 16px; min-height: 100px; padding: 14px 16px;
+    border-radius: 14px; border: 2px dashed #c99a00; cursor: pointer; text-decoration: none; color: #3a2e00;
+    background: repeating-linear-gradient(45deg, #fff4c2 0 14px, #ffe98a 14px 28px); animation: adIn .15s ease-out;
+  }
+  .ad .tag { display: block; font-size: 11px; letter-spacing: 1px; color: #8a7300; }
+  .ad .get { margin-left: auto; background: #1a73e8; color: #fff; border-radius: 999px; padding: 10px 16px; font-weight: bold; white-space: nowrap; }
+  @keyframes adIn { from { opacity: .3; } to { opacity: 1; } }
+
+  /* Simulated thumb going for the button */
+  .finger {
+    position: fixed; z-index: 900; font-size: 46px; line-height: 1; pointer-events: none; opacity: 0;
+    transform: translate(40px, 140px); transition: transform .45s ease-out, opacity .25s;
+  }
+  .finger.go { opacity: 1; transform: translate(-16px, -2px); }
+  .ripple {
+    position: fixed; z-index: 899; width: 26px; height: 26px; margin: -13px 0 0 -13px; border-radius: 50%;
+    background: rgba(26, 115, 232, .45); pointer-events: none; animation: ripple .6s ease-out forwards;
+  }
+  @keyframes ripple { to { transform: scale(3.2); opacity: 0; } }
+  .toast {
+    position: fixed; left: 50%; bottom: 64px; transform: translateX(-50%); z-index: 950; width: max-content;
+    max-width: calc(100% - 32px); background: #222; color: #fff; padding: 12px 16px; border-radius: 12px;
+    font-size: 15px; line-height: 1.4; opacity: 0; transition: opacity .2s; pointer-events: none;
+  }
+  .toast.show { opacity: 1; }
+  .clock.done { background: #b3261e; }
+</style>
+<script>
+  // Pretend this is "tag-manager-bundle.js" (2.3 MB), loaded without async/defer.
+</script>
+</head>
+<body>
+
+<div class="site">
+  <header class="topbar">
+    <div class="wrap">
+      <div class="logo">Loblolly <span>&amp;</span> Lace</div>
+      <nav class="nav">
+        <a href="#new">New in</a>
+        <a href="#lookbook">Lookbook</a>
+        <a href="#visit">Visit</a>
+      </nav>
+      <a class="bag" href="#">🛍 Bag (0)</a>
+    </div>
+  </header>
+
+  <section class="hero">
+    <div class="wrap">
+      <div class="hero-img" id="heroImg" role="img" aria-label="A clothing rack of fall dresses under the Lost Pines">
+        <svg class="art" viewBox="0 0 1200 500" preserveAspectRatio="xMidYMid slice" aria-hidden="true">
+          <defs>
+            <linearGradient id="sky" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#f7e1d2"/><stop offset="1" stop-color="#e6ae97"/></linearGradient>
+            <symbol id="pine" viewBox="0 0 100 200"><path d="M50 0 80 60H65l25 60H72l28 60H56v20H44v-20H0l28-60H10l25-60H20Z"/></symbol>
+          </defs>
+          <rect width="1200" height="500" fill="url(#sky)"/>
+          <circle cx="930" cy="120" r="70" fill="#fcefe2"/>
+          <g fill="#6f8b76" opacity=".6"><use href="#pine" x="-10" y="200" width="120" height="260"/><use href="#pine" x="180" y="230" width="100" height="230"/><use href="#pine" x="960" y="210" width="110" height="250"/><use href="#pine" x="1110" y="240" width="100" height="220"/></g>
+          <g fill="#2f4a3a"><use href="#pine" x="70" y="170" width="140" height="300"/><use href="#pine" x="1010" y="180" width="140" height="290"/></g>
+          <rect y="455" width="1200" height="45" fill="#c98a6b"/>
+          <g stroke="#3b2f28" stroke-width="10" stroke-linecap="round" fill="none"><path d="M390 150H810M410 150 385 455M790 150 815 455"/></g>
+          <g stroke="#3b2f28" stroke-width="4" fill="none"><path d="M460 150v14M430 184l30-20 30 20M550 150v14M520 184l30-20 30 20M640 150v14M610 184l30-20 30 20M730 150v14M700 184l30-20 30 20"/></g>
+          <path d="M434 184h52l-6 56 38 160H402l38-160Z" fill="#b8643f"/>
+          <path d="M520 184h60l30 36-15 15-13-15v100h-64V220l-13 15-15-15Z" fill="#fffaf4"/>
+          <path d="M614 184h52l-6 56 30 120H590l30-120Z" fill="#2f4a3a"/>
+          <path d="M700 184h60l30 36-15 15-13-15v120h-64V220l-13 15-15-15Z" fill="#d9a441"/>
+        </svg>
+      </div>
+      <div class="hero-copy" id="heroCopy">
+        <p class="eyebrow">New for fall · Main Street, Bastrop</p>
+        <h1>Fall looks, fresh off the rack.</h1>
+        <p class="lede">A tiny boutique in Bastrop, Texas with soft flannels, easy dresses, and boots made for Main Street. New pieces every Thursday.</p>
+        <div class="cta" id="cta">
+          <a class="btn" id="shopNow" href="#new">Shop now</a>
+          <a class="btn ghost" href="#visit">Visit the shop</a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="section" id="new">
+    <div class="wrap">
+      <h2>New this week</h2>
+      <p class="sub">Small batches, so when it's gone, it's gone.</p>
+      <div class="grid">
+        <div class="card"><div class="pic"><div class="art p1">👗</div></div><div class="info"><h3>Riverwalk Midi Dress</h3><span class="price">$68</span></div></div>
+        <div class="card"><div class="pic"><div class="art p2">🧥</div></div><div class="info"><h3>Lost Pines Shacket</h3><span class="price">$54</span></div></div>
+        <div class="card"><div class="pic"><div class="art p3">👒</div></div><div class="info"><h3>Wide-Brim Felt Hat</h3><span class="price">$42</span></div></div>
+        <div class="card"><div class="pic"><div class="art p4">👢</div></div><div class="info"><h3>Main Street Boots</h3><span class="price">$128</span></div></div>
+        <div class="card"><div class="pic"><div class="art p5">👜</div></div><div class="info"><h3>Colorado River Tote</h3><span class="price">$36</span></div></div>
+        <div class="card"><div class="pic"><div class="art p6">🧣</div></div><div class="info"><h3>Firefly Knit Scarf</h3><span class="price">$24</span></div></div>
+      </div>
+    </div>
+  </section>
+
+  <section class="section lookbook" id="lookbook">
+    <div class="wrap">
+      <h2>The Lookbook</h2>
+      <p class="sub">How Bastrop wears it. Swipe for ideas.</p>
+      <div class="wait" id="wait"><span class="mini-spin"></span> Loading lookbook…</div>
+      <div class="track" id="track">
+        <div class="slide s1"><div class="em">🌻</div><b>Sunday on Main</b><span>Midi dress + felt hat</span></div>
+        <div class="slide s2"><div class="em">🧺</div><b>River park picnic</b><span>Shacket + scarf</span></div>
+        <div class="slide s3"><div class="em">🏈</div><b>Friday night lights</b><span>Flannel + boots</span></div>
+        <div class="slide s4"><div class="em">🍑</div><b>Farmers market run</b><span>Tote + everything</span></div>
+        <div class="slide s5"><div class="em">🎬</div><b>Drive-in date night</b><span>Knit + midi</span></div>
+      </div>
+    </div>
+  </section>
+
+  <section class="section visit" id="visit">
+    <div class="wrap">
+      <div><h2>Hours</h2><p>Tue&ndash;Sat &nbsp;10 a.m. &ndash; 6 p.m.<br>Sun &nbsp;12 &ndash; 4 p.m.<br>Closed Mondays</p></div>
+      <div><h2>Find us</h2><p>On Main Street in Bastrop, TX.<br>Look for the pink door and the dog on the porch.</p></div>
+      <div><h2>Call</h2><p><a href="tel:+15125550138">(512) 555-0138</a><br>We'll hold anything for 24 hours.</p></div>
+    </div>
+  </section>
+
+  <footer>
+    <div class="wrap">Loblolly &amp; Lace is a fictional business. This demo site shows what a slow-loading page with layout shift feels like.</div>
+  </footer>
+</div>
+
+<!-- ============ Demo overlays ============ -->
+<div class="splash" id="splash">
+  <div class="spinner"></div>
+  <div id="splashMsg">Loading experience…</div>
+  <div class="bar"><i id="splashBar"></i></div>
+  <div class="pct" id="splashPct">0%</div>
+</div>
+<div class="finger" id="finger">👆</div>
+<div class="toast" id="toast"></div>
+<div class="clock" id="clock">⏱ 0.0s</div>
+
+<script>
+  // Everything below exists to make loading worse. Demo only.
+  // performance.now() counts from navigation start, so the timeline is the same on every refresh.
+  const $ = id => document.getElementById(id);
+  const root = document.documentElement;
+  let jumps = 0;
+
+  function at(ms, fn) {
+    setTimeout(() => { try { fn(); } catch (err) { console.error(err); } }, Math.max(0, ms - performance.now()));
+  }
+  function jumpText() { return jumps + (jumps === 1 ? ' layout jump' : ' layout jumps'); }
+  function secs() { return (performance.now() / 1000).toFixed(1) + 's'; }
+
+  // Stopwatch
+  const clock = $('clock');
+  const tick = setInterval(() => { clock.textContent = '⏱ ' + secs() + ' · ' + jumpText(); }, 100);
+
+  let toastTimer;
+  function toast(msg) {
+    const t = $('toast');
+    t.textContent = msg;
+    t.classList.add('show');
+    clearTimeout(toastTimer);
+    toastTimer = setTimeout(() => t.classList.remove('show'), 2800);
+  }
+
+  // 0.3s: the render-blocking bundle "executes" and freezes the tab on a white screen.
+  at(300, () => {
+    const until = 1850;
+    while (performance.now() < until) { /* parsing 2.3 MB of tracking scripts */ }
+  });
+
+  // 2.0s: finally something paints... a splash screen.
+  at(2000, () => {
+    root.classList.remove('blank');
+    $('splash').classList.add('show');
+    const bar = setInterval(() => {
+      const t = performance.now();
+      const pct = Math.min(99, Math.round((t - 2000) / 1500 * 99));
+      $('splashBar').style.width = pct + '%';
+      $('splashPct').textContent = pct + '%';
+      $('splashMsg').textContent = t > 3900 ? 'Still almost there…' : t > 3000 ? 'Optimizing your experience…' : 'Loading experience…';
+      if (t > 4600) clearInterval(bar);
+    }, 100);
+  });
+
+  // 4.5s: splash goes away, but the text is invisible (waiting on the web font).
+  at(4500, () => $('splash').classList.remove('show'));
+
+  // 6.0s: font "arrives", text appears.
+  at(6000, () => root.classList.remove('foit'));
+
+  // 6.8s: hero image pops in with no reserved space. Everything jumps down.
+  at(6800, () => { $('heroImg').classList.add('loaded', 'scan'); jumps++; });
+
+  // 7.8s: you go to tap "Shop now"...
+  let target = null;
+  at(7800, () => {
+    const r = $('shopNow').getBoundingClientRect();
+    if (r.top < 0 || r.bottom > innerHeight) return;           // button not on screen, skip the gag
+    target = { x: r.left + Math.min(60, r.width / 2), y: r.top + r.height / 2 };
+    const f = $('finger');
+    f.style.left = target.x + 'px';
+    f.style.top = target.y + 'px';
+    requestAnimationFrame(() => f.classList.add('go'));
+  });
+
+  // 8.3s: ...and a sponsored banner injects right above it.
+  function adClick(e) { e.preventDefault(); toast('🙃 Oops, you tapped an ad. Opening App Store…'); }
+  at(8300, () => {
+    const ad = document.createElement('a');
+    ad.className = 'ad';
+    ad.href = '#';
+    ad.innerHTML = '<span style="font-size:34px">📲</span><span><span class="tag">SPONSORED</span><b>15% OFF</b> your first order in the Loblolly app!</span><span class="get">GET APP</span>';
+    ad.addEventListener('click', adClick);
+    $('cta').before(ad);
+    jumps++;
+  });
+
+  // 8.45s: the tap lands on whatever is there now.
+  at(8450, () => {
+    if (!target) return;
+    const dot = document.createElement('div');
+    dot.className = 'ripple';
+    dot.style.left = target.x + 'px';
+    dot.style.top = target.y + 'px';
+    document.body.appendChild(dot);
+    setTimeout(() => dot.remove(), 700);
+    const hit = document.elementFromPoint(target.x, target.y);
+    if (hit && hit.closest('.ad')) toast('🙃 Oops, you tapped an ad. Opening App Store…');
+  });
+  at(9300, () => $('finger').classList.remove('go'));
+
+  // 9.0s+: product photos trickle in one at a time, each one shoving the grid around.
+  document.querySelectorAll('.pic').forEach((pic, i) => {
+    at(9000 + i * 300, () => { pic.classList.add('loaded', 'scan'); jumps++; });
+  });
+
+  // 11.0s: the carousel loads dead last and pushes the page down again.
+  at(11000, () => {
+    $('wait').hidden = true;
+    $('track').classList.add('loaded');
+    jumps++;
+    startCarousel();
+  });
+
+  // 11.3s: "fully loaded"
+  at(11300, () => {
+    clearInterval(tick);
+    root.classList.remove('blank', 'foit');
+    $('splash').classList.remove('show');
+    clock.textContent = '🐢 Loaded in ' + secs() + ' · ' + jumpText();
+    clock.classList.add('done');
+  });
+
+  // Lookbook auto-advance (same as the fixed version)
+  function startCarousel() {
+    const track = $('track');
+    setInterval(() => {
+      const slide = track.querySelector('.slide');
+      const step = slide.offsetWidth + 16;
+      const atEnd = track.scrollLeft + track.clientWidth >= track.scrollWidth - 4;
+      track.scrollTo({ left: atEnd ? 0 : track.scrollLeft + step, behavior: 'smooth' });
+    }, 3000);
+  }
+</script>
+
+</body>
+</html>

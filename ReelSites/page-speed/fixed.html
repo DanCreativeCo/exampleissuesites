@@ -1,0 +1,265 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Loblolly &amp; Lace Boutique</title>
+<style>
+  /* ============================================================
+     FIXED VERSION: same boutique as index.html, loaded the fast way
+       - no render-blocking scripts (third-party tags use defer/async)
+       - no splash screen: real content is the first thing that paints
+       - system font stack (or font-display: swap), so text never goes invisible
+       - every image box reserves its space with aspect-ratio
+         (on a real site: width/height attributes on <img>)
+       - light placeholder color behind each image, art fades in on top
+       - the app promo has its own slot at the top from the first paint
+       - carousel is in the HTML from the start with its size reserved
+       - zero layout shift; everything is in place in well under a second
+     ============================================================ */
+
+  *, *::before, *::after { box-sizing: border-box; }
+
+  :root {
+    --cream: #f8f2ea;
+    --linen: #fffaf4;
+    --pine: #2f4a3a;
+    --blush: #e9b8a8;
+    --clay: #b8643f;
+    --mustard: #d9a441;
+    --ink: #2a2420;
+    --muted: #7a6d62;
+    --line: #eadfd2;
+  }
+
+  body {
+    margin: 0;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    background: var(--cream);
+    color: var(--ink);
+  }
+  h1, h2, h3, .logo { font-family: "Didot", "Bodoni 72", Georgia, "Times New Roman", serif; }
+
+  .wrap { max-width: 1120px; margin: 0 auto; padding-inline: clamp(16px, 5vw, 48px); }
+
+  /* ---------- Header ---------- */
+  .topbar { background: var(--linen); border-bottom: 1px solid var(--line); }
+  .topbar .wrap { display: flex; align-items: center; gap: 24px; min-height: 64px; }
+  .logo { font-size: 22px; font-weight: bold; color: var(--pine); margin-right: auto; }
+  .logo span { color: var(--clay); font-style: italic; }
+  .nav { display: flex; gap: 22px; }
+  .nav a { color: var(--ink); text-decoration: none; }
+  .bag { color: var(--pine); font-weight: bold; text-decoration: none; white-space: nowrap; }
+  @media (max-width: 640px) { .nav { display: none; } }
+
+  /* ---------- Hero ---------- */
+  .hero { padding: 20px 0 48px; }
+  .hero-img {
+    border-radius: 20px; overflow: hidden; aspect-ratio: 16 / 9;
+    background: #efe2d6;
+  }
+  .hero-img svg { display: block; width: 100%; height: 100%; }
+  .hero-copy { padding-top: 24px; }
+  .eyebrow { text-transform: uppercase; letter-spacing: 2px; font-size: 13px; font-weight: bold; color: var(--clay); margin: 0 0 10px; }
+  .hero h1 { font-size: clamp(36px, 6vw, 60px); line-height: 1.05; margin: 0 0 14px; max-width: 18ch; }
+  .lede { font-size: clamp(16px, 2vw, 20px); line-height: 1.5; color: var(--muted); max-width: 46ch; margin: 0 0 24px; }
+  .cta { display: flex; gap: 12px; flex-wrap: wrap; }
+  .btn {
+    display: inline-block; background: var(--pine); color: #fff; text-decoration: none;
+    padding: 15px 28px; border-radius: 999px; font-weight: bold; font-size: 17px; border: 0; cursor: pointer;
+  }
+  .btn.ghost { background: transparent; color: var(--pine); box-shadow: inset 0 0 0 2px var(--pine); }
+  @media (min-width: 800px) {
+    .hero-img { aspect-ratio: 4 / 1; }
+    .hero h1 { max-width: none; }
+    .lede { max-width: 62ch; }
+  }
+
+  /* ---------- Products ---------- */
+  .section { padding: 56px 0; }
+  .section h2 { font-size: clamp(28px, 4vw, 40px); margin: 0 0 6px; }
+  .sub { color: var(--muted); margin: 0 0 24px; line-height: 1.5; }
+  .grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px; }
+  @media (min-width: 800px) { .grid { grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 24px; } }
+  .card { background: var(--linen); border: 1px solid var(--line); border-radius: 16px; overflow: hidden; }
+  .pic { aspect-ratio: 4 / 5; background: #efe2d6; }
+  .art { width: 100%; height: 100%; display: grid; place-items: center; font-size: clamp(56px, 13vw, 104px); }
+  .info { padding: 12px 14px 16px; }
+  .info h3 { font-size: 17px; margin: 0 0 4px; }
+  .price { color: var(--clay); font-weight: bold; }
+  .p1 { background: linear-gradient(160deg, #f6d6ca, #e9a994); }
+  .p2 { background: linear-gradient(160deg, #cfdccf, #7f9f86); }
+  .p3 { background: linear-gradient(160deg, #f5e3bd, #d9a441); }
+  .p4 { background: linear-gradient(160deg, #e6cdb8, #9c6a4a); }
+  .p5 { background: linear-gradient(160deg, #d9e2ea, #8ea3b5); }
+  .p6 { background: linear-gradient(160deg, #f3d0d6, #c9727f); }
+
+  /* ---------- Lookbook carousel ---------- */
+  .lookbook { background: var(--pine); color: var(--linen); }
+  .lookbook .sub { color: #c9d6cc; }
+  .track {
+    display: flex; gap: 16px; overflow-x: auto; scroll-snap-type: x mandatory;
+    scrollbar-width: none; padding-bottom: 4px;
+  }
+  .track::-webkit-scrollbar { display: none; }
+  .slide {
+    flex: 0 0 min(78%, 340px); scroll-snap-align: start; aspect-ratio: 4 / 3; border-radius: 18px;
+    padding: 18px; display: flex; flex-direction: column; color: var(--ink);
+  }
+  .slide .em { font-size: 60px; margin-bottom: auto; }
+  .slide b { font-family: Georgia, serif; font-size: 22px; }
+  .slide span { font-size: 14px; color: #5b4f46; }
+  .s1 { background: linear-gradient(135deg, #f8e0a8, #e9b27a); }
+  .s2 { background: linear-gradient(135deg, #f3d6cb, #d98f7e); }
+  .s3 { background: linear-gradient(135deg, #d8e4d3, #93b39a); }
+  .s4 { background: linear-gradient(135deg, #f7ccb4, #e08e5f); }
+  .s5 { background: linear-gradient(135deg, #e0d7ee, #a894c9); }
+
+  /* ---------- Visit + footer ---------- */
+  .visit .wrap { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 28px; }
+  .visit h2 { font-size: 26px; margin: 0 0 10px; color: var(--pine); }
+  .visit p { margin: 0; line-height: 1.7; }
+  .visit a { color: var(--clay); font-weight: bold; }
+  footer { background: var(--ink); color: #bfb2a5; font-size: 14px; padding: 28px 0 70px; line-height: 1.5; }
+
+  /* ---------- Demo stopwatch (same in both files) ---------- */
+  .clock {
+    position: fixed; left: 12px; bottom: 12px; z-index: 1000; pointer-events: none;
+    font: 600 14px/1 ui-monospace, Menlo, Consolas, monospace; color: #fff;
+    background: rgba(20, 20, 20, .85); padding: 9px 13px; border-radius: 999px;
+  }
+
+  /* ============================================================
+     THE FIXES
+     ============================================================ */
+
+  /* The promo exists from the first paint, so it never pushes anything */
+  .promo { background: var(--pine); color: var(--linen); text-align: center; font-size: 14px; line-height: 20px; padding: 9px 16px; }
+  .promo a { color: var(--mustard); font-weight: bold; }
+
+  /* Image boxes already have their size (aspect-ratio) and a placeholder color.
+     The picture just fades in on top, nothing moves. */
+  .hero-img .art, .pic .art { animation: fadeIn .35s .1s ease-out both; }
+  @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+  @media (prefers-reduced-motion: reduce) { .hero-img .art, .pic .art { animation: none; } }
+
+  .clock.done { background: #1e7a46; }
+</style>
+</head>
+<body>
+
+<div class="site">
+  <div class="promo">📲 15% off your first order in our app. <a href="#">Get it</a></div>
+
+  <header class="topbar">
+    <div class="wrap">
+      <div class="logo">Loblolly <span>&amp;</span> Lace</div>
+      <nav class="nav">
+        <a href="#new">New in</a>
+        <a href="#lookbook">Lookbook</a>
+        <a href="#visit">Visit</a>
+      </nav>
+      <a class="bag" href="#">🛍 Bag (0)</a>
+    </div>
+  </header>
+
+  <section class="hero">
+    <div class="wrap">
+      <div class="hero-img" id="heroImg" role="img" aria-label="A clothing rack of fall dresses under the Lost Pines">
+        <svg class="art" viewBox="0 0 1200 500" preserveAspectRatio="xMidYMid slice" aria-hidden="true">
+          <defs>
+            <linearGradient id="sky" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#f7e1d2"/><stop offset="1" stop-color="#e6ae97"/></linearGradient>
+            <symbol id="pine" viewBox="0 0 100 200"><path d="M50 0 80 60H65l25 60H72l28 60H56v20H44v-20H0l28-60H10l25-60H20Z"/></symbol>
+          </defs>
+          <rect width="1200" height="500" fill="url(#sky)"/>
+          <circle cx="930" cy="120" r="70" fill="#fcefe2"/>
+          <g fill="#6f8b76" opacity=".6"><use href="#pine" x="-10" y="200" width="120" height="260"/><use href="#pine" x="180" y="230" width="100" height="230"/><use href="#pine" x="960" y="210" width="110" height="250"/><use href="#pine" x="1110" y="240" width="100" height="220"/></g>
+          <g fill="#2f4a3a"><use href="#pine" x="70" y="170" width="140" height="300"/><use href="#pine" x="1010" y="180" width="140" height="290"/></g>
+          <rect y="455" width="1200" height="45" fill="#c98a6b"/>
+          <g stroke="#3b2f28" stroke-width="10" stroke-linecap="round" fill="none"><path d="M390 150H810M410 150 385 455M790 150 815 455"/></g>
+          <g stroke="#3b2f28" stroke-width="4" fill="none"><path d="M460 150v14M430 184l30-20 30 20M550 150v14M520 184l30-20 30 20M640 150v14M610 184l30-20 30 20M730 150v14M700 184l30-20 30 20"/></g>
+          <path d="M434 184h52l-6 56 38 160H402l38-160Z" fill="#b8643f"/>
+          <path d="M520 184h60l30 36-15 15-13-15v100h-64V220l-13 15-15-15Z" fill="#fffaf4"/>
+          <path d="M614 184h52l-6 56 30 120H590l30-120Z" fill="#2f4a3a"/>
+          <path d="M700 184h60l30 36-15 15-13-15v120h-64V220l-13 15-15-15Z" fill="#d9a441"/>
+        </svg>
+      </div>
+      <div class="hero-copy" id="heroCopy">
+        <p class="eyebrow">New for fall · Main Street, Bastrop</p>
+        <h1>Fall looks, fresh off the rack.</h1>
+        <p class="lede">A tiny boutique in Bastrop, Texas with soft flannels, easy dresses, and boots made for Main Street. New pieces every Thursday.</p>
+        <div class="cta" id="cta">
+          <a class="btn" id="shopNow" href="#new">Shop now</a>
+          <a class="btn ghost" href="#visit">Visit the shop</a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="section" id="new">
+    <div class="wrap">
+      <h2>New this week</h2>
+      <p class="sub">Small batches, so when it's gone, it's gone.</p>
+      <div class="grid">
+        <div class="card"><div class="pic"><div class="art p1">👗</div></div><div class="info"><h3>Riverwalk Midi Dress</h3><span class="price">$68</span></div></div>
+        <div class="card"><div class="pic"><div class="art p2">🧥</div></div><div class="info"><h3>Lost Pines Shacket</h3><span class="price">$54</span></div></div>
+        <div class="card"><div class="pic"><div class="art p3">👒</div></div><div class="info"><h3>Wide-Brim Felt Hat</h3><span class="price">$42</span></div></div>
+        <div class="card"><div class="pic"><div class="art p4">👢</div></div><div class="info"><h3>Main Street Boots</h3><span class="price">$128</span></div></div>
+        <div class="card"><div class="pic"><div class="art p5">👜</div></div><div class="info"><h3>Colorado River Tote</h3><span class="price">$36</span></div></div>
+        <div class="card"><div class="pic"><div class="art p6">🧣</div></div><div class="info"><h3>Firefly Knit Scarf</h3><span class="price">$24</span></div></div>
+      </div>
+    </div>
+  </section>
+
+  <section class="section lookbook" id="lookbook">
+    <div class="wrap">
+      <h2>The Lookbook</h2>
+      <p class="sub">How Bastrop wears it. Swipe for ideas.</p>
+      <div class="track" id="track">
+        <div class="slide s1"><div class="em">🌻</div><b>Sunday on Main</b><span>Midi dress + felt hat</span></div>
+        <div class="slide s2"><div class="em">🧺</div><b>River park picnic</b><span>Shacket + scarf</span></div>
+        <div class="slide s3"><div class="em">🏈</div><b>Friday night lights</b><span>Flannel + boots</span></div>
+        <div class="slide s4"><div class="em">🍑</div><b>Farmers market run</b><span>Tote + everything</span></div>
+        <div class="slide s5"><div class="em">🎬</div><b>Drive-in date night</b><span>Knit + midi</span></div>
+      </div>
+    </div>
+  </section>
+
+  <section class="section visit" id="visit">
+    <div class="wrap">
+      <div><h2>Hours</h2><p>Tue&ndash;Sat &nbsp;10 a.m. &ndash; 6 p.m.<br>Sun &nbsp;12 &ndash; 4 p.m.<br>Closed Mondays</p></div>
+      <div><h2>Find us</h2><p>On Main Street in Bastrop, TX.<br>Look for the pink door and the dog on the porch.</p></div>
+      <div><h2>Call</h2><p><a href="tel:+15125550138">(512) 555-0138</a><br>We'll hold anything for 24 hours.</p></div>
+    </div>
+  </section>
+
+  <footer>
+    <div class="wrap">Loblolly &amp; Lace is a fictional business. This demo site shows a page that loads fast and doesn't jump around.</div>
+  </footer>
+</div>
+
+<!-- ============ Demo overlay ============ -->
+<div class="clock" id="clock">⏱ 0.0s</div>
+
+<script>
+  // Nothing on this page waits on JavaScript. The script only runs the stopwatch and the carousel.
+  const clock = document.getElementById('clock');
+  function showLoadTime() {
+    clock.textContent = '⚡ Loaded in ' + (performance.now() / 1000).toFixed(2) + 's · 0 layout jumps';
+    clock.classList.add('done');
+  }
+  if (document.readyState === 'complete') showLoadTime();
+  else window.addEventListener('load', showLoadTime);
+
+  // Lookbook auto-advance (same as index.html)
+  const track = document.getElementById('track');
+  setInterval(() => {
+    const slide = track.querySelector('.slide');
+    const step = slide.offsetWidth + 16;
+    const atEnd = track.scrollLeft + track.clientWidth >= track.scrollWidth - 4;
+    track.scrollTo({ left: atEnd ? 0 : track.scrollLeft + step, behavior: 'smooth' });
+  }, 3000);
+</script>
+
+</body>
+</html>
