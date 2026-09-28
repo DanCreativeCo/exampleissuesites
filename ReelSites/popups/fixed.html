@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Hollow Oak Bakery</title>
+<style>
+  /* ============================================================
+     FIXED VERSION: same bakery as index.html, with the popups calmed down
+       - cookie notice is a slim bar that doesn't block the page
+       - "Accept" and "Reject" are the same size and weight
+       - no scroll lock, no timers, no queued modals
+       - newsletter offer lives in the page, so people who want it can find it
+       - one quiet announcement, no fake countdown
+       - chat is a small button that only opens when you click it
+       - no notification prompt, no spin-to-win, no exit-intent modal
+     ============================================================ */
+
+  *, *::before, *::after { box-sizing: border-box; }
+
+  :root {
+    --crust: #7a4a22;
+    --dough: #fbf3e6;
+    --flour: #fffaf2;
+    --honey: #e9a93b;
+    --berry: #b8324f;
+    --ink: #2e1f14;
+    --muted: #7d6b5a;
+  }
+
+  body {
+    margin: 0;
+    font-family: "Trebuchet MS", "Segoe UI", sans-serif;
+    background: var(--dough);
+    color: var(--ink);
+  }
+  body.locked { overflow: hidden; }   /* scroll lock whenever anything is open */
+
+  .wrap { max-width: 1100px; margin: 0 auto; padding-inline: clamp(16px, 5vw, 48px); }
+  h2 { font-size: clamp(28px, 4vw, 40px); margin: 0 0 20px; }
+
+  /* ---------- The actual (fine) site ---------- */
+  .topbar { background: var(--flour); border-bottom: 1px solid #ecdcc4; }
+  .topbar .wrap { display: flex; align-items: center; gap: 24px; min-height: 72px; flex-wrap: wrap; }
+  .logo { font-weight: bold; font-size: 22px; letter-spacing: 2px; color: var(--crust); margin-right: auto; }
+  .nav { display: flex; gap: 22px; }
+  .nav a { color: var(--ink); text-decoration: none; }
+  @media (max-width: 640px) { .nav { display: none; } }
+
+  .hero { padding: clamp(48px, 10vw, 110px) 0; background: radial-gradient(circle at 80% 30%, #f6d9a8, var(--dough) 60%); }
+  .hero h1 { font-size: clamp(38px, 7vw, 72px); line-height: 1.05; margin: 0 0 18px; max-width: 12ch; }
+  .hero p { font-size: clamp(17px, 2vw, 21px); line-height: 1.5; max-width: 34ch; margin: 0 0 28px; color: var(--muted); }
+  .btn {
+    display: inline-block; background: var(--crust); color: #fff; text-decoration: none;
+    padding: 14px 26px; border-radius: 999px; font-weight: bold; font-size: 17px; border: 0; cursor: pointer;
+  }
+
+  .menu { padding: 70px 0; }
+  .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 20px; }
+  .item { background: var(--flour); border-radius: 14px; padding: 22px; border: 1px solid #ecdcc4; }
+  .item .emoji { font-size: 40px; }
+  .item h3 { margin: 10px 0 6px; }
+  .item p { margin: 0 0 10px; color: var(--muted); line-height: 1.5; }
+  .item b { color: var(--crust); }
+
+  .visit { background: var(--crust); color: var(--dough); padding: 60px 0; }
+  .visit .wrap { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 32px; }
+  .visit h2 { color: var(--honey); }
+  .visit p { line-height: 1.7; margin: 0; }
+
+  footer { background: var(--ink); color: #b9a58f; font-size: 14px; padding: 28px 0; }
+
+  /* ---------- Calm extras ---------- */
+  .announce { background: var(--crust); color: var(--dough); text-align: center; font-size: 14px; padding: 8px 16px; }
+  .announce a { color: var(--honey); }
+
+  .signup { background: var(--flour); border-top: 1px solid #ecdcc4; padding: 56px 0; }
+  .signup .wrap { display: flex; flex-wrap: wrap; align-items: center; gap: 20px 40px; }
+  .signup h2 { margin: 0 0 6px; }
+  .signup p { margin: 0; color: var(--muted); }
+  .signup form { display: flex; gap: 10px; flex: 1 1 320px; }
+  .signup input { flex: 1; min-width: 0; padding: 14px; font-size: 16px; border: 1px solid #d8c6ab; border-radius: 999px; }
+
+  .cookie-bar {
+    position: fixed; left: 16px; right: 16px; bottom: 16px; z-index: 60; max-width: 560px;
+    background: #fff; border: 1px solid #ecdcc4; border-radius: 14px; padding: 16px 18px;
+    box-shadow: 0 10px 30px rgba(0,0,0,.12); font-size: 14px; line-height: 1.5;
+  }
+  .cookie-bar p { margin: 0 0 12px; }
+  .cookie-bar .row { display: flex; gap: 10px; }
+  .cookie-bar button {
+    flex: 1; padding: 10px; font-size: 15px; font-weight: bold; border-radius: 999px; cursor: pointer;
+    border: 2px solid var(--crust); background: #fff; color: var(--crust);
+  }
+  .cookie-bar[hidden] { display: none; }
+
+  .chat-btn {
+    position: fixed; right: 16px; bottom: 16px; z-index: 50; border: 1px solid #ecdcc4; background: #fff;
+    color: var(--crust); border-radius: 999px; padding: 10px 16px; font-size: 14px; font-weight: bold; cursor: pointer;
+    box-shadow: 0 4px 14px rgba(0,0,0,.1);
+  }
+  .chat-panel {
+    position: fixed; right: 16px; bottom: 70px; z-index: 50; width: min(320px, calc(100% - 32px));
+    background: #fff; border: 1px solid #ecdcc4; border-radius: 14px; padding: 16px; font-size: 14px; line-height: 1.5;
+    box-shadow: 0 10px 30px rgba(0,0,0,.12);
+  }
+  .chat-panel[hidden] { display: none; }
+  .chat-panel p { margin: 0 0 8px; }
+  /* Keep the chat button out from under the cookie bar on phones */
+  body:has(.cookie-bar:not([hidden])) .chat-btn { display: none; }
+</style>
+</head>
+<body>
+
+  <div class="announce">🥧 Pecan pies are back for fall. <a href="#">Pre-order yours</a></div>
+
+  <!-- ============ The site ============ -->
+  <div class="topbar">
+    <div class="wrap">
+      <div class="logo">HOLLOW OAK BAKERY</div>
+      <nav class="nav">
+        <a href="#menu">Menu</a>
+        <a href="#visit">Visit</a>
+        <a href="#">Catering</a>
+      </nav>
+      <a class="btn" href="#">Order Ahead</a>
+    </div>
+  </div>
+
+  <section class="hero">
+    <div class="wrap">
+      <h1>Warm kolaches by 6&nbsp;a.m.</h1>
+      <p>A small-batch bakery in Bastrop, Texas. Everything is baked this morning, and when it's gone, it's gone.</p>
+      <a class="btn" href="#">Order for pickup</a>
+    </div>
+  </section>
+
+  <section class="menu" id="menu">
+    <div class="wrap">
+      <h2>Today's case</h2>
+      <div class="grid">
+        <div class="item"><div class="emoji">🥯</div><h3>Sausage kolache</h3><p>Jalapeño-cheddar sausage wrapped in soft, sweet dough.</p><b>$3.25</b></div>
+        <div class="item"><div class="emoji">🍑</div><h3>Peach kolache</h3><p>Fredericksburg peaches over a lightly sweet cream-cheese base.</p><b>$3.00</b></div>
+        <div class="item"><div class="emoji">🌀</div><h3>Cinnamon roll</h3><p>Big as your hand, brown-butter glaze, pecans on request.</p><b>$4.50</b></div>
+        <div class="item"><div class="emoji">🍞</div><h3>Country sourdough</h3><p>36-hour ferment and a dark crust. Ready at 10 a.m.</p><b>$9.00</b></div>
+      </div>
+    </div>
+  </section>
+
+  <section class="visit" id="visit">
+    <div class="wrap">
+      <div><h2>Hours</h2><p>Tue&ndash;Fri &nbsp;6 a.m. &ndash; 2 p.m.<br>Sat &ndash; Sun &nbsp;7 a.m. &ndash; 1 p.m.<br>Closed Mondays</p></div>
+      <div><h2>Find us</h2><p>Just off Main Street in Bastrop, TX.<br>Look for the big oak tree and the line out the door.</p></div>
+    </div>
+  </section>
+
+  <section class="signup">
+    <div class="wrap">
+      <div>
+        <h2>Fresh-out-of-the-oven emails</h2>
+        <p>One email a week with specials. 10% off your first order.</p>
+      </div>
+      <form onsubmit="return false">
+        <input type="email" placeholder="you@example.com" aria-label="Email address">
+        <button class="btn">Sign up</button>
+      </form>
+    </div>
+  </section>
+
+  <footer>
+    <div class="wrap">Hollow Oak Bakery is a fictional business. This demo site shows popups done respectfully.</div>
+  </footer>
+
+  <div class="cookie-bar" id="cookie" role="region" aria-label="Cookie notice">
+    <p>🍪 We use a few cookies to remember your order and see which pages get used. <a href="#">Details</a></p>
+    <div class="row">
+      <button onclick="document.getElementById('cookie').hidden = true">Reject</button>
+      <button onclick="document.getElementById('cookie').hidden = true">Accept</button>
+    </div>
+  </div>
+
+  <button class="chat-btn" aria-expanded="false" aria-controls="chat" onclick="toggleChat(this)">💬 Questions?</button>
+  <div class="chat-panel" id="chat" hidden>
+    <p><b>Hi! Questions about an order?</b></p>
+    <p>Call us at (512) 555-0147 or text anytime. We usually reply within the hour during open hours.</p>
+  </div>
+
+<script>
+  function toggleChat(btn) {
+    const panel = document.getElementById('chat');
+    panel.hidden = !panel.hidden;
+    btn.setAttribute('aria-expanded', String(!panel.hidden));
+  }
+</script>
+
+</body>
+</html>

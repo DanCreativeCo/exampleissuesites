@@ -1,0 +1,388 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Hollow Oak Bakery</title>
+<style>
+  /* ============================================================
+     INTENTIONALLY BAD POPUPS — DEMO ONLY
+     The page underneath is fine. Everything on top of it is not:
+       - full-screen cookie wall with a giant "Accept" and a hidden "manage" link
+       - app-download banner + sticky promo bar eating the top of the screen
+       - newsletter modal on a timer, with a delayed, tiny close button
+       - confirmshaming "No thanks" copy
+       - spin-to-win wheel right after you close the newsletter
+       - fake-urgency countdown
+       - chat widget that bounces, auto-opens, and covers the Order button
+       - notification permission nag
+       - exit-intent "Leaving so soon?!" modal
+       - popups queue up so closing one just reveals the next
+     ============================================================ */
+
+  *, *::before, *::after { box-sizing: border-box; }
+
+  :root {
+    --crust: #7a4a22;
+    --dough: #fbf3e6;
+    --flour: #fffaf2;
+    --honey: #e9a93b;
+    --berry: #b8324f;
+    --ink: #2e1f14;
+    --muted: #7d6b5a;
+  }
+
+  body {
+    margin: 0;
+    font-family: "Trebuchet MS", "Segoe UI", sans-serif;
+    background: var(--dough);
+    color: var(--ink);
+  }
+  body.locked { overflow: hidden; }   /* scroll lock whenever anything is open */
+
+  .wrap { max-width: 1100px; margin: 0 auto; padding-inline: clamp(16px, 5vw, 48px); }
+  h2 { font-size: clamp(28px, 4vw, 40px); margin: 0 0 20px; }
+
+  /* ---------- The actual (fine) site ---------- */
+  .topbar { background: var(--flour); border-bottom: 1px solid #ecdcc4; }
+  .topbar .wrap { display: flex; align-items: center; gap: 24px; min-height: 72px; flex-wrap: wrap; }
+  .logo { font-weight: bold; font-size: 22px; letter-spacing: 2px; color: var(--crust); margin-right: auto; }
+  .nav { display: flex; gap: 22px; }
+  .nav a { color: var(--ink); text-decoration: none; }
+  @media (max-width: 640px) { .nav { display: none; } }
+
+  .hero { padding: clamp(48px, 10vw, 110px) 0; background: radial-gradient(circle at 80% 30%, #f6d9a8, var(--dough) 60%); }
+  .hero h1 { font-size: clamp(38px, 7vw, 72px); line-height: 1.05; margin: 0 0 18px; max-width: 12ch; }
+  .hero p { font-size: clamp(17px, 2vw, 21px); line-height: 1.5; max-width: 34ch; margin: 0 0 28px; color: var(--muted); }
+  .btn {
+    display: inline-block; background: var(--crust); color: #fff; text-decoration: none;
+    padding: 14px 26px; border-radius: 999px; font-weight: bold; font-size: 17px; border: 0; cursor: pointer;
+  }
+
+  .menu { padding: 70px 0; }
+  .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 20px; }
+  .item { background: var(--flour); border-radius: 14px; padding: 22px; border: 1px solid #ecdcc4; }
+  .item .emoji { font-size: 40px; }
+  .item h3 { margin: 10px 0 6px; }
+  .item p { margin: 0 0 10px; color: var(--muted); line-height: 1.5; }
+  .item b { color: var(--crust); }
+
+  .visit { background: var(--crust); color: var(--dough); padding: 60px 0; }
+  .visit .wrap { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 32px; }
+  .visit h2 { color: var(--honey); }
+  .visit p { line-height: 1.7; margin: 0; }
+
+  footer { background: var(--ink); color: #b9a58f; font-size: 14px; padding: 28px 0; }
+
+  /* ============================================================
+     THE BAD STUFF
+     ============================================================ */
+
+  /* App banner + promo bar, both stuck to the top */
+  .stack-top { position: sticky; top: 0; z-index: 50; }
+  .app-banner {
+    display: flex; align-items: center; gap: 12px; background: #fff; padding: 10px 14px;
+    border-bottom: 1px solid #ddd; font-size: 14px;
+  }
+  .app-banner .icon { width: 40px; height: 40px; border-radius: 10px; background: var(--crust); color: #fff; display: grid; place-items: center; font-size: 22px; }
+  .app-banner .open { margin-left: auto; background: #1a73e8; color: #fff; border-radius: 999px; padding: 8px 18px; font-weight: bold; text-decoration: none; }
+  .app-banner .x { color: #bbb; font-size: 12px; cursor: pointer; }
+  .promo-bar {
+    background: var(--berry); color: #fff; text-align: center; font-weight: bold;
+    padding: 12px 14px; font-size: 15px; letter-spacing: .5px;
+  }
+  .promo-bar .timer { font-family: monospace; background: rgba(0,0,0,.25); padding: 2px 8px; border-radius: 4px; }
+
+  /* Generic overlay/modal */
+  .overlay {
+    position: fixed; inset: 0; background: rgba(20, 12, 6, .72); z-index: 100;
+    display: none; align-items: center; justify-content: center; padding: 16px;
+  }
+  .overlay.show { display: flex; animation: pop .25s ease-out; }
+  @keyframes pop { from { opacity: 0; transform: scale(.94); } to { opacity: 1; transform: none; } }
+  .modal {
+    position: relative; background: #fff; border-radius: 16px; width: min(460px, 100%);
+    padding: 34px 28px 24px; text-align: center; box-shadow: 0 30px 80px rgba(0,0,0,.4);
+  }
+  .modal h2 { font-size: clamp(26px, 6vw, 36px); margin-bottom: 10px; }
+  .modal p { color: var(--muted); line-height: 1.5; }
+  .modal input { width: 100%; padding: 14px; font-size: 16px; border: 2px solid #ddd; border-radius: 8px; margin: 10px 0; }
+  .modal .big { width: 100%; background: var(--berry); color: #fff; font-size: 19px; padding: 16px; }
+  .tiny-x {
+    position: absolute; top: 6px; right: 10px; font-size: 11px; color: #d6d6d6;
+    cursor: pointer; visibility: hidden;          /* shows up "eventually" */
+  }
+  .shame { display: block; margin-top: 14px; font-size: 12px; color: #aaa; text-decoration: underline; cursor: pointer; }
+
+  /* Cookie wall: covers everything, can't scroll past it */
+  #cookie { z-index: 300; background: rgba(20, 12, 6, .9); align-items: flex-end; padding: 0; }
+  #cookie .sheet { background: #fff; width: 100%; padding: 28px clamp(16px, 5vw, 48px) 34px; }
+  #cookie h3 { margin: 0 0 8px; font-size: 22px; }
+  #cookie p { margin: 0 0 18px; color: var(--muted); font-size: 13px; line-height: 1.5; max-width: 80ch; }
+  #cookie .accept { width: 100%; background: #1a73e8; color: #fff; font-size: 20px; padding: 18px; border-radius: 10px; border: 0; font-weight: bold; cursor: pointer; }
+  #cookie .manage { display: inline-block; margin-top: 12px; font-size: 10px; color: #c9c9c9; }
+
+  /* Spin to win */
+  .wheel {
+    width: 220px; height: 220px; border-radius: 50%; margin: 10px auto 18px; border: 6px solid var(--ink);
+    background: conic-gradient(var(--berry) 0 45deg, var(--honey) 45deg 90deg, var(--crust) 90deg 135deg, #f6d9a8 135deg 180deg,
+                               var(--berry) 180deg 225deg, var(--honey) 225deg 270deg, var(--crust) 270deg 315deg, #f6d9a8 315deg 360deg);
+    transition: transform 3s cubic-bezier(.2,.8,.2,1);
+  }
+
+  /* Notification nag */
+  .notify {
+    position: fixed; top: 12px; left: 50%; transform: translateX(-50%); z-index: 150;
+    width: min(380px, calc(100% - 24px)); background: #fff; border-radius: 12px; padding: 16px;
+    box-shadow: 0 12px 40px rgba(0,0,0,.35); display: none; font-size: 15px;
+  }
+  .notify.show { display: block; animation: pop .25s ease-out; }
+  .notify .row { display: flex; gap: 10px; justify-content: flex-end; margin-top: 12px; }
+  .notify button { border: 0; border-radius: 6px; padding: 8px 14px; cursor: pointer; font-weight: bold; }
+  .notify .yes { background: #1a73e8; color: #fff; }
+  .notify .later { background: none; color: #999; }
+
+  /* Chat widget */
+  .chat-bubble {
+    position: fixed; right: 16px; bottom: 16px; z-index: 90; width: 64px; height: 64px; border-radius: 50%;
+    background: #1a73e8; color: #fff; display: grid; place-items: center; font-size: 30px; cursor: pointer;
+    box-shadow: 0 8px 24px rgba(0,0,0,.3); animation: bounce 1s infinite;
+  }
+  .chat-bubble .badge {
+    position: absolute; top: -2px; right: -2px; background: red; color: #fff; font-size: 13px; font-weight: bold;
+    width: 24px; height: 24px; border-radius: 50%; display: grid; place-items: center;
+  }
+  @keyframes bounce { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-10px); } }
+  .chat-panel {
+    position: fixed; right: 16px; bottom: 92px; z-index: 90; width: min(340px, calc(100% - 32px)); height: 420px;
+    background: #fff; border-radius: 16px; box-shadow: 0 16px 50px rgba(0,0,0,.35); display: none; flex-direction: column; overflow: hidden;
+  }
+  .chat-panel.show { display: flex; animation: pop .25s ease-out; }
+  .chat-panel header { background: #1a73e8; color: #fff; padding: 14px 16px; font-weight: bold; display: flex; }
+  .chat-panel header span { margin-left: auto; cursor: pointer; font-size: 12px; opacity: .6; }
+  .chat-panel .msgs { flex: 1; padding: 14px; background: #f3f5f8; display: flex; flex-direction: column; gap: 10px; overflow: auto; }
+  .chat-panel .msg { background: #fff; border-radius: 12px; padding: 10px 12px; max-width: 85%; font-size: 14px; line-height: 1.4; box-shadow: 0 1px 2px rgba(0,0,0,.08); }
+  .chat-panel input { border: 0; border-top: 1px solid #ddd; padding: 14px; font-size: 15px; }
+</style>
+</head>
+<body class="locked">
+
+  <!-- ============ Sticky junk at the top ============ -->
+  <div class="stack-top">
+    <div class="app-banner">
+      <div class="icon">🥐</div>
+      <div><b>Hollow Oak App</b><br><span style="color:#888">★★★★★ &middot; FREE</span></div>
+      <a class="open" href="#">OPEN</a>
+      <span class="x" onclick="this.parentNode.remove()">✕</span>
+    </div>
+    <div class="promo-bar">
+      🔥 FLASH SALE ENDS IN <span class="timer" id="countdown">00:09:59</span> 🔥 USE CODE <u>CRUMBS</u>
+    </div>
+  </div>
+
+  <!-- ============ The actual site (perfectly fine) ============ -->
+  <div class="topbar">
+    <div class="wrap">
+      <div class="logo">HOLLOW OAK BAKERY</div>
+      <nav class="nav">
+        <a href="#menu">Menu</a>
+        <a href="#visit">Visit</a>
+        <a href="#">Catering</a>
+      </nav>
+      <a class="btn" href="#">Order Ahead</a>
+    </div>
+  </div>
+
+  <section class="hero">
+    <div class="wrap">
+      <h1>Warm kolaches by 6&nbsp;a.m.</h1>
+      <p>A small-batch bakery in Bastrop, Texas. Everything is baked this morning, and when it's gone, it's gone.</p>
+      <a class="btn" href="#">Order for pickup</a>
+    </div>
+  </section>
+
+  <section class="menu" id="menu">
+    <div class="wrap">
+      <h2>Today's case</h2>
+      <div class="grid">
+        <div class="item"><div class="emoji">🥯</div><h3>Sausage kolache</h3><p>Jalapeño-cheddar sausage wrapped in soft, sweet dough.</p><b>$3.25</b></div>
+        <div class="item"><div class="emoji">🍑</div><h3>Peach kolache</h3><p>Fredericksburg peaches over a lightly sweet cream-cheese base.</p><b>$3.00</b></div>
+        <div class="item"><div class="emoji">🌀</div><h3>Cinnamon roll</h3><p>Big as your hand, brown-butter glaze, pecans on request.</p><b>$4.50</b></div>
+        <div class="item"><div class="emoji">🍞</div><h3>Country sourdough</h3><p>36-hour ferment and a dark crust. Ready at 10 a.m.</p><b>$9.00</b></div>
+      </div>
+    </div>
+  </section>
+
+  <section class="visit" id="visit">
+    <div class="wrap">
+      <div><h2>Hours</h2><p>Tue&ndash;Fri &nbsp;6 a.m. &ndash; 2 p.m.<br>Sat &ndash; Sun &nbsp;7 a.m. &ndash; 1 p.m.<br>Closed Mondays</p></div>
+      <div><h2>Find us</h2><p>Just off Main Street in Bastrop, TX.<br>Look for the big oak tree and the line out the door.</p></div>
+    </div>
+  </section>
+
+  <footer>
+    <div class="wrap">Hollow Oak Bakery is a fictional business. This demo site shows what popup overload looks like.</div>
+  </footer>
+
+  <!-- ============ Overlays ============ -->
+
+  <!-- 1. Cookie wall -->
+  <div class="overlay show" id="cookie">
+    <div class="sheet">
+      <h3>🍪 We value your privacy</h3>
+      <p>We and our 847 partners use cookies and similar technologies to store and access information on your device, to deliver personalized advertising and content, to measure advertising and content performance, to develop and improve products, and for audience insights. By clicking "Accept All" you consent to the processing of your data for all of the above purposes. You can change your preferences at any time, probably.</p>
+      <button class="accept" onclick="closeCookie()">ACCEPT ALL</button>
+      <a class="manage" href="#">manage preferences</a>
+    </div>
+  </div>
+
+  <!-- 2. Newsletter modal -->
+  <div class="overlay" id="newsletter">
+    <div class="modal">
+      <span class="tiny-x" onclick="closeModal('newsletter')">✕</span>
+      <div style="font-size:48px">🥐</div>
+      <h2>WAIT! Don't go hungry!</h2>
+      <p>Join 12,000+ bread lovers and get <b>10% OFF</b> your first order, plus daily emails about bread.</p>
+      <input type="email" placeholder="Enter your email">
+      <button class="btn big" onclick="closeModal('newsletter')">GIVE ME 10% OFF</button>
+      <span class="shame" onclick="closeModal('newsletter')">No thanks, I don't like fresh bread.</span>
+    </div>
+  </div>
+
+  <!-- 3. Spin to win -->
+  <div class="overlay" id="spin">
+    <div class="modal">
+      <span class="tiny-x" onclick="closeModal('spin')">✕</span>
+      <h2>🎉 You've been selected!</h2>
+      <p>Spin the wheel for a chance to win a FREE dozen kolaches!*</p>
+      <div class="wheel" id="wheel"></div>
+      <button class="btn big" id="spin-btn">SPIN NOW</button>
+      <span class="shame" onclick="closeModal('spin')">I'd rather pay full price.</span>
+      <p style="font-size:10px;margin:14px 0 0">*Requires email, phone number, and app download. Prize odds not disclosed.</p>
+    </div>
+  </div>
+
+  <!-- 4. Exit intent -->
+  <div class="overlay" id="exit">
+    <div class="modal">
+      <span class="tiny-x" style="visibility:visible" onclick="closeModal('exit')">✕</span>
+      <div style="font-size:48px">😢</div>
+      <h2>Leaving so soon?!</h2>
+      <p>Your cart is lonely. Here's <b>15% OFF</b> if you stay. This offer will never come back (until your next visit).</p>
+      <button class="btn big" onclick="closeModal('exit')">OK I'LL STAY</button>
+      <span class="shame" onclick="closeModal('exit')">No, I want to miss out.</span>
+    </div>
+  </div>
+
+  <!-- Notification nag -->
+  <div class="notify" id="notify">
+    🔔 <b>Hollow Oak Bakery</b> wants to send you notifications about fresh bread, sales, and more bread.
+    <div class="row">
+      <button class="later" onclick="nagAgain()">Later</button>
+      <button class="yes" onclick="this.closest('.notify').classList.remove('show')">Allow</button>
+    </div>
+  </div>
+
+  <!-- Chat widget -->
+  <div class="chat-bubble" onclick="toggleChat()">💬<span class="badge">3</span></div>
+  <div class="chat-panel" id="chat">
+    <header>Crumbs, your Bread Assistant 🤖 <span onclick="toggleChat()">minimize</span></header>
+    <div class="msgs" id="msgs"></div>
+    <input placeholder="Type a message...">
+  </div>
+
+<script>
+  // Everything below exists to make the visit worse. Demo only.
+
+  // Countdown that just resets itself when it hits zero.
+  let secs = 599;
+  setInterval(() => {
+    secs = secs > 0 ? secs - 1 : 599;
+    const m = String(Math.floor(secs / 60)).padStart(2, '0');
+    const s = String(secs % 60).padStart(2, '0');
+    document.getElementById('countdown').textContent = `00:${m}:${s}`;
+  }, 1000);
+
+  const open = new Set(['cookie']);
+  function lock() { document.body.classList.toggle('locked', open.size > 0); }
+
+  function showModal(id) {
+    const el = document.getElementById(id);
+    el.classList.add('show');
+    open.add(id);
+    lock();
+    // The close button only appears after a few seconds, and it's tiny.
+    const x = el.querySelector('.tiny-x');
+    if (x && id !== 'exit') setTimeout(() => (x.style.visibility = 'visible'), 4000);
+  }
+
+  // Closing one popup just queues up the next.
+  const next = { newsletter: 'spin' };
+  function closeModal(id) {
+    document.getElementById(id).classList.remove('show');
+    open.delete(id);
+    lock();
+    if (next[id]) setTimeout(() => showModal(next[id]), 1200);
+    if (id === 'spin') setTimeout(openChat, 1500);
+  }
+
+  function closeCookie() {
+    document.getElementById('cookie').classList.remove('show');
+    open.delete('cookie');
+    lock();
+    setTimeout(() => document.getElementById('notify').classList.add('show'), 600);
+    setTimeout(() => showModal('newsletter'), 2500);
+  }
+
+  // "Later" means "in 8 seconds".
+  function nagAgain() {
+    const n = document.getElementById('notify');
+    n.classList.remove('show');
+    setTimeout(() => n.classList.add('show'), 8000);
+  }
+
+  // Spin the wheel... which always lands on "try again".
+  document.getElementById('spin-btn').onclick = function () {
+    document.getElementById('wheel').style.transform = 'rotate(1800deg)';
+    this.disabled = true;
+    setTimeout(() => {
+      this.textContent = 'SO CLOSE! Enter email to spin again';
+      this.disabled = false;
+      this.onclick = () => closeModal('spin');
+    }, 3100);
+  };
+
+  // Chat auto-opens and types at you.
+  const lines = [
+    'Hi there! 👋',
+    "I'm Crumbs, the Hollow Oak Bread Assistant!",
+    'Can I help you find the perfect loaf today? 🍞',
+    'Hello?? Are you still there? 😊',
+  ];
+  let chatOpened = false;
+  function openChat() {
+    if (chatOpened) return;
+    chatOpened = true;
+    document.getElementById('chat').classList.add('show');
+    lines.forEach((t, i) => setTimeout(() => {
+      const m = document.createElement('div');
+      m.className = 'msg';
+      m.textContent = t;
+      document.getElementById('msgs').appendChild(m);
+    }, 900 * (i + 1) + (i === 3 ? 4000 : 0)));
+  }
+  function toggleChat() { document.getElementById('chat').classList.toggle('show'); chatOpened = true; }
+  setTimeout(openChat, 20000); // opens on its own even if you never close the others
+
+  // Exit intent: mouse heads toward the tabs/address bar.
+  let exitShown = false;
+  document.addEventListener('mouseout', e => {
+    if (!e.relatedTarget && e.clientY < 10 && !exitShown && !open.has('cookie')) {
+      exitShown = true;
+      showModal('exit');
+    }
+  });
+</script>
+
+</body>
+</html>
