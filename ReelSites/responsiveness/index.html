@@ -1,0 +1,398 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<!-- Viewport tag is present, so phones render at device width... and every fixed-width layout below breaks. -->
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Iron Bridge Restoration Project</title>
+<style>
+  /* ============================================================
+     INTENTIONALLY BAD RESPONSIVENESS — DEMO ONLY
+     Anti-patterns used on purpose:
+       - fixed pixel widths everywhere (no max-width, no %)
+       - absolute positioning for layout
+       - floats with hard-coded column widths
+       - nowrap nav with lots of links
+       - px font sizes, huge hero text
+       - fixed-width images / SVG
+       - zero media queries
+     ============================================================ */
+
+  body {
+    margin: 0;
+    font-family: Georgia, "Times New Roman", serif;
+    background: #efe7da;
+    color: #2b2118;
+    width: 1280px;                 /* page locked to desktop width */
+  }
+
+  /* ---------- Header / nav ---------- */
+  .topbar {
+    height: 90px;
+    background: #2b2118;
+    position: relative;
+  }
+  .logo {
+    position: absolute;
+    left: 40px;
+    top: 22px;
+    color: #e8a34a;
+    font-size: 30px;
+    font-weight: bold;
+    letter-spacing: 3px;
+    white-space: nowrap;
+  }
+  .nav {
+    position: absolute;
+    left: 520px;                   /* hard-coded offset */
+    top: 34px;
+    white-space: nowrap;
+  }
+  .nav a {
+    color: #efe7da;
+    text-decoration: none;
+    font-size: 17px;
+    margin-left: 34px;
+  }
+  .donate-btn {
+    position: absolute;
+    left: 1110px;                  /* lives off-screen on a phone */
+    top: 24px;
+    width: 130px;
+    height: 42px;
+    line-height: 42px;
+    text-align: center;
+    background: #b5462b;
+    color: #fff;
+    font-weight: bold;
+    font-size: 16px;
+    border-radius: 3px;
+  }
+
+  /* ---------- Hero ---------- */
+  .hero {
+    position: relative;
+    height: 620px;
+    background: linear-gradient(#f3c77e 0%, #e8a34a 45%, #b5462b 100%);
+    overflow: hidden;
+  }
+  .hero h1 {
+    position: absolute;
+    left: 80px;
+    top: 70px;
+    width: 760px;
+    margin: 0;
+    font-size: 84px;
+    line-height: 88px;
+    color: #2b2118;
+  }
+  .hero p {
+    position: absolute;
+    left: 84px;
+    top: 330px;
+    width: 560px;
+    font-size: 22px;
+    line-height: 32px;
+  }
+  .hero .cta {
+    position: absolute;
+    left: 84px;
+    top: 470px;
+    width: 280px;
+    height: 60px;
+    line-height: 60px;
+    text-align: center;
+    background: #2b2118;
+    color: #efe7da;
+    font-size: 20px;
+    text-decoration: none;
+  }
+  .hero .cta2 {
+    position: absolute;
+    left: 390px;
+    top: 470px;
+    width: 280px;
+    height: 56px;
+    line-height: 56px;
+    text-align: center;
+    border: 2px solid #2b2118;
+    color: #2b2118;
+    font-size: 20px;
+    text-decoration: none;
+  }
+  .hero svg {
+    position: absolute;
+    left: 560px;
+    top: 250px;
+    width: 900px;                  /* fixed-width illustration */
+    height: 370px;
+  }
+
+  /* ---------- Stats strip ---------- */
+  .stats {
+    height: 170px;
+    background: #2b2118;
+    color: #efe7da;
+  }
+  .stat {
+    float: left;
+    width: 320px;                  /* 4 × 320 = 1280, no wrapping allowed */
+    height: 170px;
+    text-align: center;
+    padding-top: 36px;
+    box-sizing: border-box;
+  }
+  .stat b {
+    display: block;
+    font-size: 54px;
+    color: #e8a34a;
+  }
+  .stat span {
+    font-size: 16px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    white-space: nowrap;
+  }
+
+  /* ---------- About (two fixed columns) ---------- */
+  .about {
+    padding: 90px 80px;
+    overflow: hidden;
+  }
+  .about .col-left {
+    float: left;
+    width: 600px;
+  }
+  .about .col-right {
+    float: left;
+    width: 460px;
+    margin-left: 60px;
+    height: 380px;
+    background: repeating-linear-gradient(45deg, #6b4a32 0 14px, #5a3d29 14px 28px);
+    color: #efe7da;
+    padding: 40px;
+    box-sizing: border-box;
+    font-size: 22px;
+    line-height: 34px;
+    font-style: italic;
+  }
+  .about h2 {
+    font-size: 48px;
+    margin: 0 0 24px;
+  }
+  .about p {
+    font-size: 19px;
+    line-height: 31px;
+  }
+
+  /* ---------- Phases table ---------- */
+  .phases {
+    padding: 0 80px 90px;
+  }
+  .phases h2 {
+    font-size: 48px;
+  }
+  table {
+    width: 1120px;
+    border-collapse: collapse;
+    font-size: 17px;
+  }
+  th, td {
+    border: 1px solid #b9a88f;
+    padding: 18px 20px;
+    text-align: left;
+    white-space: nowrap;           /* long cells never wrap */
+  }
+  th {
+    background: #2b2118;
+    color: #e8a34a;
+  }
+
+  /* ---------- Get involved: 3 fixed cards ---------- */
+  .involve {
+    background: #d9ccb6;
+    padding: 90px 80px;
+    overflow: hidden;
+  }
+  .involve h2 {
+    font-size: 48px;
+    margin-top: 0;
+  }
+  .card {
+    float: left;
+    width: 340px;
+    height: 300px;
+    margin-right: 50px;
+    background: #efe7da;
+    padding: 34px;
+    box-sizing: border-box;
+    position: relative;
+  }
+  .card:last-child { margin-right: 0; }
+  .card h3 { font-size: 26px; margin-top: 0; }
+  .card p { font-size: 17px; line-height: 27px; }
+  .card a {
+    position: absolute;
+    bottom: 30px;
+    left: 34px;
+    color: #b5462b;
+    font-weight: bold;
+    font-size: 17px;
+  }
+
+  /* ---------- Newsletter (inline form, fixed widths) ---------- */
+  .newsletter {
+    padding: 70px 80px;
+    background: #b5462b;
+    color: #fff;
+    height: 110px;
+    position: relative;
+  }
+  .newsletter h3 {
+    position: absolute;
+    left: 80px;
+    top: 50px;
+    margin: 0;
+    font-size: 30px;
+    white-space: nowrap;
+  }
+  .newsletter input {
+    position: absolute;
+    left: 600px;
+    top: 58px;
+    width: 400px;
+    height: 50px;
+    font-size: 17px;
+    padding: 0 14px;
+    border: 0;
+  }
+  .newsletter button {
+    position: absolute;
+    left: 1032px;
+    top: 58px;
+    width: 170px;
+    height: 52px;
+    font-size: 17px;
+    background: #2b2118;
+    color: #fff;
+    border: 0;
+  }
+
+  /* ---------- Footer ---------- */
+  footer {
+    background: #2b2118;
+    color: #a89a86;
+    padding: 40px 80px;
+    font-size: 15px;
+    white-space: nowrap;
+  }
+</style>
+</head>
+<body>
+
+  <div class="topbar">
+    <div class="logo">IRON BRIDGE</div>
+    <div class="nav">
+      <a href="#">History</a>
+      <a href="#">The Project</a>
+      <a href="#">Timeline</a>
+      <a href="#">Volunteer</a>
+      <a href="#">Events</a>
+    </div>
+    <div class="donate-btn">Donate</div>
+  </div>
+
+  <section class="hero">
+    <h1>Iron Bridge Restoration Project</h1>
+    <p>Preserving the historic steel truss that carries walkers and cyclists over the Colorado River in Bastrop, Texas, so it can stand for another hundred years.</p>
+    <a class="cta" href="#">Support the Restoration</a>
+    <a class="cta2" href="#">Plan a Visit</a>
+
+    <!-- Fixed-size truss bridge illustration -->
+    <svg viewBox="0 0 900 370" xmlns="http://www.w3.org/2000/svg">
+      <!-- river -->
+      <rect x="0" y="300" width="900" height="70" fill="#3d6b73"/>
+      <path d="M0 318 Q 60 312 120 318 T 240 318 T 360 318 T 480 318 T 600 318 T 720 318 T 840 318 T 960 318" stroke="#8fb3b5" stroke-width="3" fill="none"/>
+      <path d="M0 342 Q 60 336 120 342 T 240 342 T 360 342 T 480 342 T 600 342 T 720 342 T 840 342 T 960 342" stroke="#8fb3b5" stroke-width="2" fill="none" opacity=".6"/>
+      <!-- piers -->
+      <rect x="40" y="220" width="40" height="100" fill="#7a6a58"/>
+      <rect x="430" y="220" width="40" height="100" fill="#7a6a58"/>
+      <rect x="820" y="220" width="40" height="100" fill="#7a6a58"/>
+      <!-- truss spans -->
+      <g stroke="#2b2118" stroke-width="6" fill="none" stroke-linejoin="round">
+        <!-- span 1 -->
+        <path d="M60 220 L450 220"/>
+        <path d="M60 220 L110 110 L400 110 L450 220"/>
+        <path d="M110 110 L110 220 M168 110 L168 220 M226 110 L226 220 M284 110 L284 220 M342 110 L342 220 M400 110 L400 220"/>
+        <path d="M110 220 L168 110 M168 220 L226 110 M226 220 L255 165 M284 110 L284 110 M284 220 L226 110 M342 220 L284 110 M400 220 L342 110"/>
+        <!-- span 2 -->
+        <path d="M450 220 L840 220"/>
+        <path d="M450 220 L500 110 L790 110 L840 220"/>
+        <path d="M500 110 L500 220 M558 110 L558 220 M616 110 L616 220 M674 110 L674 220 M732 110 L732 220 M790 110 L790 220"/>
+        <path d="M500 220 L558 110 M558 220 L616 110 M674 220 L616 110 M732 220 L674 110 M790 220 L732 110"/>
+      </g>
+      <!-- deck -->
+      <rect x="40" y="218" width="820" height="10" fill="#2b2118"/>
+    </svg>
+  </section>
+
+  <section class="stats">
+    <div class="stat"><b>2</b><span>Truss Spans</span></div>
+    <div class="stat"><b>1</b><span>Colorado River</span></div>
+    <div class="stat"><b>100%</b><span>Pedestrian &amp; Bike</span></div>
+    <div class="stat"><b>&infin;</b><span>Sunset Photos</span></div>
+  </section>
+
+  <section class="about">
+    <div class="col-left">
+      <h2>A landmark worth saving</h2>
+      <p>For generations, the old iron bridge has been one of Bastrop's most recognizable sights &mdash; a riveted steel truss stretching across the Colorado River just steps from historic Main Street. Once a vital crossing for cars and wagons, it now serves as a peaceful path for walkers, joggers, and cyclists.</p>
+      <p>Time, weather, and the river have taken their toll. The Iron Bridge Restoration Project brings together neighbors, historians, and engineers to clean, repaint, and reinforce the structure while keeping its character intact.</p>
+    </div>
+    <div class="col-right">
+      &ldquo;Every town has a place where people go to watch the river roll by. In Bastrop, that place has always been the iron bridge.&rdquo;
+    </div>
+  </section>
+
+  <section class="phases">
+    <h2>Restoration Timeline</h2>
+    <table>
+      <tr><th>Phase</th><th>Scope of Work</th><th>Status</th><th>Target</th></tr>
+      <tr><td>Phase 1 &mdash; Assessment</td><td>Structural survey of trusses, rivets, deck, and river piers</td><td>Complete</td><td>Spring</td></tr>
+      <tr><td>Phase 2 &mdash; Surface Prep</td><td>Abrasive blasting, rust removal, and lead-safe containment over the river</td><td>In Progress</td><td>Summer</td></tr>
+      <tr><td>Phase 3 &mdash; Repair</td><td>Replace corroded members and gusset plates, upgrade handrails for pedestrian safety</td><td>Planned</td><td>Fall</td></tr>
+      <tr><td>Phase 4 &mdash; Finish</td><td>Historic-color repaint, LED accent lighting, and interpretive signage at both approaches</td><td>Planned</td><td>Winter</td></tr>
+    </table>
+  </section>
+
+  <section class="involve">
+    <h2>Get involved</h2>
+    <div class="card">
+      <h3>Volunteer</h3>
+      <p>Join a monthly clean-up day along the riverbank and bridge approaches. Gloves and cold drinks provided.</p>
+      <a href="#">Sign up &rarr;</a>
+    </div>
+    <div class="card">
+      <h3>Sponsor a Rivet</h3>
+      <p>Put your family's name on the bridge's future. Every sponsorship funds a piece of the repair.</p>
+      <a href="#">Sponsor now &rarr;</a>
+    </div>
+    <div class="card">
+      <h3>Share Your Story</h3>
+      <p>First date on the bridge? Fishing below it as a kid? Help us build an oral history of Bastrop's river crossing.</p>
+      <a href="#">Tell us &rarr;</a>
+    </div>
+  </section>
+
+  <section class="newsletter">
+    <h3>Get restoration updates</h3>
+    <input type="email" placeholder="you@example.com">
+    <button>Subscribe</button>
+  </section>
+
+  <footer>
+    Iron Bridge Restoration Project &nbsp;&middot;&nbsp; Bastrop, Texas &nbsp;&middot;&nbsp; A demo site built to show what poor responsive design looks like. Not affiliated with the City of Bastrop.
+  </footer>
+
+</body>
+</html>
