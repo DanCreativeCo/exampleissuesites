@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lazy Gar Paddle &amp; Tube Co.</title>
+<style>
+  /* ============================================================
+     INTENTIONALLY BAD READABILITY — DEMO ONLY
+     The layout is fine. The text is not:
+       - white, thin text dropped straight onto a busy "photo" hero, no overlay
+       - yellow and pale-gray text on white backgrounds
+       - 11px body copy in an ultra-light font weight
+       - ALL-CAPS italic script paragraph, centered AND justified,
+         with huge letter-spacing and no max line length (runs edge to edge on desktop)
+       - links the same color as the text, no underline
+       - form fields with placeholder-only "labels" in near-white gray
+       - ghost buttons: white text on pastel backgrounds
+       - dark-blue text on a dark-blue section
+       - the most important info (life jackets, river status) is the hardest to read
+     ============================================================ */
+
+  *, *::before, *::after { box-sizing: border-box; }
+
+  :root {
+    --river: #0e6e8c;
+    --deep: #0b3b4f;
+    --navy: #1e3450;
+    --sand: #fbf6ec;
+    --sun: #ffc93c;
+    --clay: #c2410c;
+    --ink: #1d2b33;
+    --line: #e7dfcf;
+  }
+
+  body {
+    margin: 0;
+    font-family: "Avenir Next", "Segoe UI", "Helvetica Neue", Arial, sans-serif;
+    background: #fff;
+    color: #c9c9c9;                 /* light gray on white */
+    font-size: 11px;                /* tiny */
+    font-weight: 200;               /* ultra-light */
+    line-height: 1.3;
+  }
+
+  .wrap { max-width: 1100px; margin: 0 auto; padding-inline: clamp(16px, 5vw, 48px); }
+  h2 { font-size: clamp(26px, 4vw, 38px); margin: 0 0 18px; color: #ffe066; font-weight: 300; }  /* yellow on white */
+  a { color: inherit; text-decoration: none; }                                                  /* links = text */
+
+  /* ---------- Header ---------- */
+  .topbar { background: #fff; border-bottom: 1px solid var(--line); }
+  .topbar .wrap { display: flex; align-items: center; gap: 24px; min-height: 72px; flex-wrap: wrap; }
+  .logo { font-size: 20px; letter-spacing: 1px; color: #bfe6f2; margin-right: auto; font-weight: 300; }
+  .logo span { font-size: 26px; }
+  .nav { display: flex; gap: 22px; font-size: 13px; }
+  @media (max-width: 640px) { .nav { display: none; } .logo { font-size: 16px; letter-spacing: .5px; } .logo span { font-size: 22px; } }
+
+  .btn {
+    display: inline-block; background: #cdeef7; color: #fff; text-decoration: none;   /* white on pastel */
+    padding: 14px 26px; border-radius: 999px; font-weight: 300; font-size: 15px; border: 0; cursor: pointer;
+    font-family: inherit;
+  }
+
+  .status { background: #fff; border-bottom: 1px solid var(--line); text-align: center; padding: 8px 16px; color: #ffe680; font-size: 11px; }
+
+  /* ---------- Hero: busy "photo", no overlay ---------- */
+  .hero { position: relative; overflow: hidden; padding: clamp(64px, 14vw, 140px) 0; }
+  .hero svg.photo { position: absolute; inset: 0; width: 100%; height: 100%; }
+  .hero .wrap { position: relative; }
+  .hero h1 {
+    font-size: clamp(40px, 7vw, 76px); line-height: 1.05; margin: 0 0 18px; max-width: 13ch;
+    color: #fff; font-weight: 200;
+  }
+  .hero p { font-size: 15px; line-height: 1.4; max-width: 36ch; margin: 0 0 28px; color: #fffbe6; font-style: italic; }
+  .hero .btn { background: rgba(255,255,255,.35); }
+
+  /* ---------- Rentals ---------- */
+  .rentals { padding: 70px 0; background: #fff; }
+  .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 20px; }
+  .item { background: var(--sand); border-radius: 14px; padding: 22px; border: 1px solid var(--line); }
+  .item .emoji { font-size: 40px; }
+  .item h3 { margin: 10px 0 6px; font-size: 17px; color: #d8d2c4; font-weight: 300; }
+  .item p { margin: 0 0 12px; color: #d3cdbf; }
+  .item .price { color: #ffd84d; font-size: 18px; }
+  .item .reserve { display: block; margin-top: 8px; color: #d3cdbf; }
+
+  /* ---------- River rules: the worst paragraph on the internet ---------- */
+  .rules { padding: 60px 0; background: #fff; border-top: 1px solid var(--line); }
+  .rules .wrap { max-width: none; }                  /* no line-length limit at all */
+  .rules h2 { text-align: center; }
+  .rules p {
+    font-family: "Brush Script MT", "Snell Roundhand", "Segoe Script", cursive;
+    font-style: italic; text-transform: uppercase; letter-spacing: .35em;
+    text-align: justify; text-align-last: center;
+    color: #cfcfcf; margin: 0 0 16px; line-height: 1.25;
+  }
+
+  /* ---------- Booking form ---------- */
+  .book { padding: 60px 0; background: var(--sand); }
+  .book form { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 14px; margin-top: 10px; }
+  .book label { display: none; }                       /* labels hidden: placeholder does the job, right? */
+  .book input, .book select {
+    width: 100%; padding: 14px; font-size: 13px; font-family: inherit; font-weight: 200;
+    border: 1px solid #f4efe4; border-radius: 10px; background: #fff; color: #cfcfcf;
+  }
+  .book input::placeholder { color: #ebebeb; }
+  .book .btn { background: #ffe9a8; }
+  .book .note { margin: 14px 0 0; }
+
+  /* ---------- Visit ---------- */
+  .visit { background: var(--navy); color: #2f4a6b; padding: 60px 0; }   /* dark on dark */
+  .visit .wrap { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 32px; }
+  .visit h2 { color: #2a4466; }
+  .visit p { line-height: 1.5; margin: 0; }
+
+  footer { background: #13233a; color: #26374f; font-size: 10px; padding: 28px 0; }
+</style>
+</head>
+<body>
+
+  <div class="topbar">
+    <div class="wrap">
+      <div class="logo"><span>🐟</span> LAZY GAR PADDLE &amp; TUBE CO.</div>
+      <nav class="nav">
+        <a href="#rentals">Rentals</a>
+        <a href="#rules">River rules</a>
+        <a href="#visit">Find us</a>
+      </nav>
+      <a class="btn" href="#book">Book a float</a>
+    </div>
+  </div>
+
+  <div class="status">🟢 River status: <b>OPEN</b> &middot; Water 74&deg;F &middot; Flow: nice and lazy</div>
+
+  <section class="hero">
+    <svg class="photo" viewBox="0 0 1200 600" preserveAspectRatio="xMidYMid slice" aria-hidden="true">
+      <defs>
+        <linearGradient id="sky" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#7fd3ff"/><stop offset="1" stop-color="#fff4c9"/></linearGradient>
+        <linearGradient id="water" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#5cc7e0"/><stop offset="1" stop-color="#1b7fa3"/></linearGradient>
+        <pattern id="glint" width="46" height="22" patternUnits="userSpaceOnUse"><path d="M2 12 q10 -8 20 0 t20 0" fill="none" stroke="#fff" stroke-width="3" opacity=".85"/><circle cx="33" cy="4" r="2.5" fill="#fff"/></pattern>
+        <pattern id="leaves" width="30" height="30" patternUnits="userSpaceOnUse"><circle cx="8" cy="8" r="7" fill="#9be07a"/><circle cx="23" cy="20" r="6" fill="#e8ff9c"/><circle cx="24" cy="5" r="3" fill="#fff"/></pattern>
+      </defs>
+      <rect width="1200" height="600" fill="url(#sky)"/>
+      <circle cx="930" cy="110" r="70" fill="#fff7b0"/><circle cx="930" cy="110" r="46" fill="#ffe14d"/>
+      <g fill="#fff"><ellipse cx="200" cy="90" rx="120" ry="34"/><ellipse cx="290" cy="70" rx="80" ry="40"/><ellipse cx="600" cy="130" rx="140" ry="30"/><ellipse cx="690" cy="110" rx="70" ry="36"/><ellipse cx="1100" cy="200" rx="110" ry="28"/></g>
+      <path d="M0 300 L40 210 L80 300 L110 190 L150 300 L190 220 L230 300 L270 180 L320 300 L360 215 L400 300 L450 185 L500 300 L540 225 L580 300 L630 195 L680 300 L720 210 L770 300 L820 180 L870 300 L910 220 L950 300 L1000 190 L1050 300 L1100 205 L1150 300 L1200 215 L1200 330 L0 330Z" fill="#3f9d4a"/>
+      <rect y="250" width="1200" height="80" fill="url(#leaves)" opacity=".8"/>
+      <rect y="320" width="1200" height="280" fill="url(#water)"/>
+      <rect y="320" width="1200" height="280" fill="url(#glint)"/>
+      <g stroke-width="14" fill="none"><circle cx="160" cy="430" r="34" stroke="#ff5fa2"/><circle cx="420" cy="500" r="30" stroke="#ffd23f"/><circle cx="700" cy="410" r="36" stroke="#ff8c42"/><circle cx="1010" cy="480" r="32" stroke="#b6ff5c"/><circle cx="560" cy="560" r="28" stroke="#fff"/></g>
+      <g><ellipse cx="300" cy="380" rx="90" ry="16" fill="#ff3b30"/><ellipse cx="860" cy="540" rx="100" ry="18" fill="#ffe600"/><ellipse cx="1130" cy="370" rx="80" ry="14" fill="#fff"/></g>
+    </svg>
+    <div class="wrap">
+      <h1>Float the Colorado. Bring snacks.</h1>
+      <p>Kayak and tube rentals on the Colorado River in Bastrop, Texas. We drop you upstream, you drift back to us. Easiest afternoon of your summer.</p>
+      <a class="btn" href="#book">Reserve your float</a>
+    </div>
+  </section>
+
+  <section class="rentals" id="rentals">
+    <div class="wrap">
+      <h2>Pick your float</h2>
+      <div class="grid">
+        <div class="item"><div class="emoji">🛶</div><h3>Single kayak</h3><p>Sit-on-top kayak, paddle, and life jacket. About 3 hours to the take-out.</p><div class="price">$35</div><a class="reserve" href="#book">Reserve &rarr;</a></div>
+        <div class="item"><div class="emoji">👯</div><h3>Tandem kayak</h3><p>Two seats, one argument about steering. Great for couples and brave friends.</p><div class="price">$55</div><a class="reserve" href="#book">Reserve &rarr;</a></div>
+        <div class="item"><div class="emoji">🛟</div><h3>River tube</h3><p>Heavy-duty tube with a mesh bottom. Cooler tubes available for your drinks.</p><div class="price">$20</div><a class="reserve" href="#book">Reserve &rarr;</a></div>
+        <div class="item"><div class="emoji">🚐</div><h3>Shuttle only</h3><p>Bring your own boat. We'll drive you and your gear to the upstream put-in.</p><div class="price">$12</div><a class="reserve" href="#book">Reserve &rarr;</a></div>
+      </div>
+    </div>
+  </section>
+
+  <section class="rules" id="rules">
+    <div class="wrap">
+      <h2>Before you float</h2>
+      <p>Life jackets are required for everyone under 13 and strongly recommended for everyone else. The river is shallow in most spots but there are a few deep holes, and the current picks up after rain. No glass on the river, and please pack out everything you pack in. We close when the river runs above 3,000 cfs, so check the status bar or <a href="#visit">call us</a> before you drive out.</p>
+      <p>Wear shoes that can get wet, bring sunscreen, and plan on about three hours from the put-in back to our dock. Last shuttle leaves at 3 p.m. Read the <a href="#">full river safety guide</a> before your trip.</p>
+    </div>
+  </section>
+
+  <section class="book" id="book">
+    <div class="wrap">
+      <h2>Book a float</h2>
+      <form onsubmit="return false">
+        <label for="name">Your name</label><input id="name" placeholder="Name">
+        <label for="email">Email</label><input id="email" type="email" placeholder="Email">
+        <label for="date">Date</label><input id="date" placeholder="Date (MM/DD)">
+        <label for="party">Party size</label><input id="party" placeholder="How many floaters?">
+        <button class="btn">Reserve</button>
+      </form>
+      <p class="note">We'll text you to confirm. Rentals are cash or card at the dock.</p>
+    </div>
+  </section>
+
+  <section class="visit" id="visit">
+    <div class="wrap">
+      <div><h2>Hours</h2><p>Thu&ndash;Mon &nbsp;9 a.m. &ndash; 6 p.m.<br>Last shuttle at 3 p.m.<br>Closed Tue &amp; Wed</p></div>
+      <div><h2>Find us</h2><p>On the Colorado River, five minutes from downtown Bastrop, TX.<br>Call or text <a href="tel:5125550138">(512) 555-0138</a></p></div>
+    </div>
+  </section>
+
+  <footer>
+    <div class="wrap">Lazy Gar Paddle &amp; Tube Co. is a fictional business. This demo site shows what unreadable text and poor contrast look like.</div>
+  </footer>
+
+</body>
+</html>
