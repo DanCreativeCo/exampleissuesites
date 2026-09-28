@@ -1,0 +1,436 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Pawpaw Creek Animal Clinic</title>
+<style>
+  /* ============================================================
+     INTENTIONALLY BAD NAVIGATION — DEMO ONLY
+     The pages are fine. Finding them is not:
+       - unlabeled "mystery" icon menu, even on desktop
+       - vague, clever labels: Discover, Our Journey, Solutions, Pawsibilities, Connect, Resources
+       - "Book appointment" is buried: Solutions > Wellness > Services > Scheduling
+       - hover-only mega menu, 3 levels deep, closes the instant the mouse slips off
+       - clicking a top-level label goes to "Coming soon" instead of opening its menu
+       - three menus (top, side drawer, footer) with different, contradicting labels
+       - side drawer submenus only open from a tiny caret; tapping the label dead-ends
+       - logo doesn't go home (it goes to "Our Journey"), and no "Home" link up top
+       - no current-page indicator, no URL change, Back button leaves the site
+       - hero button says "Begin your journey" and goes to... the history page
+       - a row of tiny, packed-together utility links that all lead to "Coming soon"
+     ============================================================ */
+
+  *, *::before, *::after { box-sizing: border-box; }
+
+  :root {
+    --teal: #1f7a74;
+    --teal-dark: #155955;
+    --mint: #e4f3ef;
+    --cream: #fbf8f2;
+    --coral: #e8735a;
+    --ink: #1d2b2a;
+    --muted: #5b6e6b;
+    --line: #d3e5e0;
+  }
+
+  body {
+    margin: 0;
+    font-family: "Segoe UI", system-ui, -apple-system, sans-serif;
+    background: var(--cream);
+    color: var(--ink);
+  }
+
+  .wrap { max-width: 1100px; margin: 0 auto; padding-inline: clamp(16px, 5vw, 48px); }
+  h2 { font-size: clamp(28px, 4vw, 40px); margin: 0 0 16px; }
+  a { color: var(--teal); }
+
+  .btn {
+    display: inline-block; background: var(--coral); color: #fff; text-decoration: none;
+    padding: 14px 26px; border-radius: 999px; font-weight: bold; font-size: 17px; border: 0; cursor: pointer;
+  }
+  .btn.ghost { background: #fff; color: var(--teal); border: 2px solid var(--teal); }
+
+  /* ---------- Header ---------- */
+  .topbar { position: sticky; top: 0; z-index: 40; background: #fff; border-bottom: 1px solid var(--line); }
+  .topbar .wrap { display: flex; align-items: center; gap: 18px; min-height: 72px; }
+  .logo { display: flex; align-items: center; gap: 10px; text-decoration: none; color: var(--teal-dark); font-weight: bold; font-size: 20px; margin-right: auto; }
+  .logo small { display: block; font-size: 12px; font-weight: normal; color: var(--muted); letter-spacing: 1px; text-transform: uppercase; }
+  .logo svg { flex: none; }
+
+  /* ---------- Panels ("pages") ---------- */
+  .panel { padding: 56px 0 72px; min-height: 60vh; }
+  .panel[hidden] { display: none; }
+  .lead { font-size: clamp(17px, 2vw, 20px); line-height: 1.55; color: var(--muted); max-width: 52ch; margin: 0 0 28px; }
+
+  .hero { background: radial-gradient(circle at 85% 20%, #cdebe4, var(--mint) 45%, var(--cream) 80%); }
+  .hero-inner { display: grid; grid-template-columns: 1.3fr .7fr; gap: 32px; align-items: center; }
+  .hero h1 { font-size: clamp(36px, 6.5vw, 64px); line-height: 1.05; margin: 0 0 18px; max-width: 14ch; }
+  .art {
+    aspect-ratio: 1; border-radius: 50%; display: grid; place-items: center; font-size: clamp(64px, 11vw, 120px);
+    background: radial-gradient(circle at 35% 30%, #fff, #bfe5dc 70%); box-shadow: 0 20px 50px rgba(31,122,116,.18);
+  }
+  @media (max-width: 700px) { .hero-inner { grid-template-columns: 1fr; } .art { width: 180px; } }
+
+  .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 20px; }
+  .card { background: #fff; border: 1px solid var(--line); border-radius: 16px; padding: 22px; }
+  .card .emoji { font-size: 36px; }
+  .card h3 { margin: 10px 0 6px; }
+  .card p { margin: 0; color: var(--muted); line-height: 1.5; }
+
+  .hours { width: 100%; border-collapse: collapse; font-size: 17px; }
+  .hours td { padding: 12px 0; border-bottom: 1px solid var(--line); }
+  .hours td:last-child { text-align: right; font-weight: bold; }
+  .map {
+    min-height: 240px; border-radius: 16px; position: relative; overflow: hidden; border: 1px solid var(--line);
+    background:
+      linear-gradient(90deg, transparent 46%, #fff 46% 50%, transparent 50%),
+      linear-gradient(0deg, transparent 58%, #fff 58% 62%, transparent 62%),
+      linear-gradient(135deg, #cfe9e2, #e9f5f1 60%, #d7eee8);
+  }
+  .map .pin { position: absolute; left: 48%; top: 60%; transform: translate(-50%, -100%); text-align: center; font-weight: bold; }
+  .map .pin span { display: block; font-size: 40px; }
+  .map .river { position: absolute; left: -10%; right: -10%; bottom: 14%; height: 26px; background: #9fd0e6; transform: rotate(-6deg); }
+
+  form.book { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px; max-width: 720px; }
+  form.book label { display: grid; gap: 6px; font-weight: bold; font-size: 15px; }
+  form.book input, form.book select { font: inherit; font-weight: normal; padding: 12px 14px; border: 1px solid #b9d6cf; border-radius: 10px; background: #fff; min-width: 0; }
+  form.book .full { grid-column: 1 / -1; }
+  @media (max-width: 600px) { form.book { grid-template-columns: 1fr; } }
+  .done { background: var(--mint); border-radius: 16px; padding: 24px; font-size: 18px; max-width: 720px; }
+
+  footer { background: var(--ink); color: #b7cbc7; font-size: 14px; padding: 36px 0; }
+  footer a { color: #e7f3f0; }
+
+  /* ============================================================
+     THE BAD STUFF
+     ============================================================ */
+
+  /* Tiny, packed utility links */
+  .util { background: var(--teal-dark); }
+  .util .wrap { display: flex; justify-content: flex-end; flex-wrap: wrap; gap: 0 3px; padding-block: 2px; }
+  .util a { color: #cfe7e2; font-size: 10px; text-decoration: none; padding: 1px 2px; }
+
+  /* Hover-only mega menu */
+  .mega ul { list-style: none; margin: 0; padding: 0; }
+  .mega > ul { display: flex; gap: 2px; }
+  .mega li { position: relative; }
+  .mega a { display: block; padding: 8px 10px; font-size: 14px; color: var(--ink); text-decoration: none; white-space: nowrap; cursor: pointer; }
+  .mega .sub {
+    display: none; position: absolute; left: 0; top: 100%; min-width: 150px; background: #fff;
+    border: 1px solid var(--line); box-shadow: 0 10px 24px rgba(0,0,0,.12); z-index: 50;
+  }
+  .mega .sub .sub { left: 100%; top: -1px; }
+  .mega li.open > .sub { display: block; }
+  .mega .sub a { font-size: 12px; padding: 5px 10px; }
+  .mega .sub .more > a::after { content: " ›"; color: var(--muted); }
+  .mega .sub a:hover { background: var(--mint); }
+  @media (max-width: 900px) { .mega { display: none; } }
+
+  /* Unlabeled icon buttons */
+  .icon-btn { width: 40px; height: 40px; border: 0; border-radius: 10px; background: var(--mint); color: var(--teal-dark); display: grid; place-items: center; cursor: pointer; font-size: 18px; }
+
+  /* Side drawer with *different* labels */
+  .scrim { position: fixed; inset: 0; background: rgba(15, 30, 28, .45); z-index: 60; display: none; }
+  .drawer {
+    position: fixed; top: 0; right: 0; bottom: 0; width: min(300px, 86vw); background: #fff; z-index: 70;
+    padding: 34px 18px 18px; overflow: auto; transform: translateX(calc(100% + 40px)); transition: transform .25s ease;
+    box-shadow: -10px 0 30px rgba(0,0,0,.2);
+  }
+  body.drawer-open .drawer { transform: none; }
+  body.drawer-open .scrim { display: block; }
+  .drawer-x { position: absolute; top: 6px; right: 8px; border: 0; background: none; font-size: 13px; color: #aaa; cursor: pointer; padding: 0; }
+  .drawer ul { list-style: none; margin: 0; padding: 0; }
+  .drawer ul ul { display: none; padding-left: 12px; border-left: 2px solid var(--mint); margin: 2px 0 4px 4px; }
+  .drawer li.open > ul { display: block; }
+  .drawer .row { display: flex; align-items: center; }
+  .drawer a { display: block; padding: 5px 0; font-size: 14px; color: var(--ink); text-decoration: none; cursor: pointer; }
+  .drawer ul ul a { font-size: 12px; padding: 3px 0; }
+  .caret { border: 0; background: none; color: var(--muted); font-size: 10px; width: 16px; height: 16px; padding: 0; cursor: pointer; margin-left: 2px; }
+  .drawer li.open > .row .caret { transform: rotate(90deg); }
+
+  .crumbs { font-size: 13px; color: var(--muted); margin: 0 0 12px; }
+  .soon { text-align: center; }
+  .soon .emoji { font-size: 72px; }
+
+  .fgrid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 24px; }
+  .fgrid b { color: #fff; display: block; margin-bottom: 8px; }
+  .fgrid a { margin-right: 8px; font-size: 12px; }
+  footer .fine { margin: 28px 0 0; }
+</style>
+</head>
+<body>
+
+  <!-- ============ Tiny utility links (all dead ends) ============ -->
+  <div class="util">
+    <div class="wrap">
+      <a data-go="soon">Portal</a><a data-go="soon">Rx</a><a data-go="soon">Pay</a><a data-go="soon">FAQ</a><a data-go="soon">Forms</a><a data-go="soon">Careers</a><a data-go="soon">Blog</a><a data-go="soon">Press</a><a data-go="soon">Visit</a><a data-go="soon">Hub</a>
+    </div>
+  </div>
+
+  <!-- ============ Header ============ -->
+  <header class="topbar">
+    <div class="wrap">
+      <!-- Logo goes to "Our Journey", not home -->
+      <a class="logo" data-go="journey">
+        <svg width="40" height="40" viewBox="0 0 40 40" aria-hidden="true"><rect width="40" height="40" rx="12" fill="#1f7a74"/><g fill="#fff"><ellipse cx="20" cy="25" rx="7" ry="6"/><circle cx="11" cy="17" r="3"/><circle cx="16.5" cy="11.5" r="3"/><circle cx="23.5" cy="11.5" r="3"/><circle cx="29" cy="17" r="3"/></g></svg>
+        <span>Pawpaw Creek<small>Animal Clinic</small></span>
+      </a>
+
+      <nav class="mega">
+        <ul>
+          <li><a data-go="soon">Discover</a>
+            <ul class="sub">
+              <li><a data-go="hours">Where &amp; When</a></li>
+              <li><a data-go="journey">Meet the Pack</a></li>
+              <li><a data-go="soon">Our Philosophy</a></li>
+            </ul>
+          </li>
+          <li><a data-go="journey">Our Journey</a></li>
+          <li><a data-go="soon">Solutions</a>
+            <ul class="sub">
+              <li class="more"><a data-go="services">Wellness</a>
+                <ul class="sub">
+                  <li><a data-go="soon">Preventive</a></li>
+                  <li class="more"><a data-go="services">Services</a>
+                    <ul class="sub">
+                      <li><a data-go="services">Vaccines</a></li>
+                      <li><a data-go="services">Dental</a></li>
+                      <li><a data-go="book" id="scheduling">Scheduling</a></li>
+                    </ul>
+                  </li>
+                  <li><a data-go="soon">Holistic</a></li>
+                </ul>
+              </li>
+              <li class="more"><a data-go="soon">Specialty</a>
+                <ul class="sub">
+                  <li><a data-go="services">Surgery</a></li>
+                  <li><a data-go="soon">Imaging</a></li>
+                </ul>
+              </li>
+              <li class="more"><a data-go="soon">Beyond</a>
+                <ul class="sub"><li><a data-go="soon">Coming soon</a></li></ul>
+              </li>
+            </ul>
+          </li>
+          <li><a data-go="soon">Pawsibilities</a>
+            <ul class="sub">
+              <li><a data-go="soon">Pet Portal</a></li>
+              <li><a data-go="soon">Pawdcast</a></li>
+              <li><a data-go="soon">Merch</a></li>
+            </ul>
+          </li>
+          <li><a data-go="soon">Connect</a></li>
+          <li><a data-go="soon">Resources</a>
+            <ul class="sub">
+              <li><a data-go="soon">FAQ</a></li>
+              <li><a data-go="soon">Forms</a></li>
+              <li><a data-go="soon">Blog</a></li>
+            </ul>
+          </li>
+        </ul>
+      </nav>
+
+      <button class="icon-btn" data-go="soon">🔍</button>
+      <!-- Mystery icon. What is it? Nobody knows. -->
+      <button class="icon-btn" id="mystery" onclick="openDrawer()">
+        <svg width="22" height="22" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 5L19 7L17 17L8 19Z" fill="none" stroke="currentColor" stroke-width="1.3"/><g fill="currentColor"><circle cx="5" cy="5" r="2.3"/><circle cx="19" cy="7" r="2.3"/><circle cx="8" cy="19" r="2.3"/><circle cx="17" cy="17" r="2.3"/></g></svg>
+      </button>
+    </div>
+  </header>
+
+  <!-- ============ Side drawer: a second menu, different labels ============ -->
+  <div class="scrim" onclick="closeDrawer()"></div>
+  <aside class="drawer" id="drawer">
+    <button class="drawer-x" onclick="closeDrawer()">✕</button>
+    <ul>
+      <li><a data-go="home">Hub</a></li>
+      <li class="more"><div class="row"><a data-go="soon">Explore</a><button class="caret">▶</button></div>
+        <ul>
+          <li><a data-go="hours">Where &amp; When</a></li>
+          <li><a data-go="journey">The Pack</a></li>
+        </ul>
+      </li>
+      <li class="more"><div class="row"><a data-go="soon">Care Solutions</a><button class="caret" id="d-solutions">▶</button></div>
+        <ul>
+          <li class="more"><div class="row"><a data-go="soon">Wellness</a><button class="caret" id="d-wellness">▶</button></div>
+            <ul>
+              <li><a data-go="soon">Preventive</a></li>
+              <li class="more"><div class="row"><a data-go="services">Services</a><button class="caret" id="d-services">▶</button></div>
+                <ul>
+                  <li><a data-go="services">Vaccines</a></li>
+                  <li><a data-go="book" id="d-scheduling">Scheduling</a></li>
+                </ul>
+              </li>
+            </ul>
+          </li>
+          <li><a data-go="soon">Specialty</a></li>
+        </ul>
+      </li>
+      <li><a data-go="contact">Get in Touch</a></li>
+      <li class="more"><div class="row"><a data-go="soon">Pawsibilities</a><button class="caret">▶</button></div>
+        <ul>
+          <li><a data-go="soon">Pet Portal</a></li>
+          <li><a data-go="soon">Pawdcast</a></li>
+        </ul>
+      </li>
+      <li><a data-go="soon">Resources Hub</a></li>
+    </ul>
+  </aside>
+
+  <main>
+    <!-- HOME -->
+    <section class="panel hero" id="p-home">
+      <div class="wrap hero-inner">
+        <div>
+          <h1>Gentle care for Bastrop's four-legged family.</h1>
+          <p class="lead">Wellness exams, vaccines, dental care and sick visits for dogs, cats and the occasional very confused rabbit. New patients welcome &mdash; book your first visit online today!</p>
+          <a class="btn" data-go="journey">Begin your journey &rarr;</a>
+        </div>
+        <div class="art" aria-hidden="true">🐶</div>
+      </div>
+      <div class="wrap" style="margin-top:56px">
+        <div class="grid">
+          <div class="card"><div class="emoji">🩺</div><h3>Same-week visits</h3><p>Most new patients are seen within a few days.</p></div>
+          <div class="card"><div class="emoji">🐾</div><h3>Fear-free handling</h3><p>Treats, towels, and zero rushing. Nervous pets welcome.</p></div>
+          <div class="card"><div class="emoji">🏡</div><h3>Local since 2009</h3><p>Started with one exam room and one very patient beagle.</p></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- OUR JOURNEY (about) -->
+    <section class="panel" id="p-journey" hidden>
+      <div class="wrap">
+        <h2>Our Journey</h2>
+        <p class="lead">It started in 2009 with one exam room, one borrowed stethoscope, and a beagle named Biscuit who refused to leave. Dr. Marisol Pruitt has been caring for Bastrop's pets ever since, now with a team of four vets and a clinic cat named Invoice.</p>
+        <p class="lead">Our mission is to pawsitively reimagine the pet-care journey. (You were probably looking for something else.)</p>
+      </div>
+    </section>
+
+    <!-- SERVICES -->
+    <section class="panel" id="p-services" hidden>
+      <div class="wrap">
+        <h2>Services</h2>
+        <p class="lead">Everything your pet needs under one roof.</p>
+        <div class="grid">
+          <div class="card"><div class="emoji">🩺</div><h3>Wellness exams</h3><p>Nose-to-tail checkups, weight and diet advice.</p></div>
+          <div class="card"><div class="emoji">💉</div><h3>Vaccines</h3><p>Core and lifestyle vaccines on a schedule that fits.</p></div>
+          <div class="card"><div class="emoji">🦷</div><h3>Dental</h3><p>Cleanings, X-rays and extractions, under gentle anesthesia.</p></div>
+          <div class="card"><div class="emoji">🤒</div><h3>Sick visits</h3><p>Same-day slots held every morning for pets who feel crummy.</p></div>
+          <div class="card"><div class="emoji">🔬</div><h3>Surgery</h3><p>Spay, neuter and soft-tissue surgery with overnight monitoring.</p></div>
+          <div class="card"><div class="emoji">🐇</div><h3>Pocket pets</h3><p>Rabbits, guinea pigs and ferrets seen by appointment.</p></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- HOURS & LOCATION -->
+    <section class="panel" id="p-hours" hidden>
+      <div class="wrap grid" style="gap:40px">
+        <div>
+          <h2>Hours &amp; Location</h2>
+          <table class="hours">
+            <tr><td>Monday &ndash; Friday</td><td>7:30 a.m. &ndash; 6 p.m.</td></tr>
+            <tr><td>Saturday</td><td>8 a.m. &ndash; noon</td></tr>
+            <tr><td>Sunday</td><td>Closed</td></tr>
+          </table>
+          <p class="lead" style="margin-top:20px">East side of Bastrop, Texas. Look for the big blue dog statue out front.</p>
+        </div>
+        <div class="map" aria-hidden="true"><div class="river"></div><div class="pin"><span>📍</span>Pawpaw Creek</div></div>
+      </div>
+    </section>
+
+    <!-- BOOK -->
+    <section class="panel" id="p-book" hidden>
+      <div class="wrap">
+        <p class="crumbs">Solutions &rsaquo; Wellness &rsaquo; Services &rsaquo; Scheduling</p>
+        <h2>Book an appointment</h2>
+        <p class="lead">Tell us a little about your pet and we'll call you to confirm a time.</p>
+        <form class="book" id="book-form">
+          <label>Your name<input autocomplete="name"></label>
+          <label>Phone<input type="tel" autocomplete="tel" placeholder="(512) 555-0100"></label>
+          <label>Pet's name<input></label>
+          <label>Species<select><option>Dog</option><option>Cat</option><option>Rabbit</option><option>Other</option></select></label>
+          <label>Reason<select><option>Wellness exam</option><option>Vaccines</option><option>Sick visit</option><option>Dental</option><option>Something else</option></select></label>
+          <label>Preferred day<input type="date"></label>
+          <div class="full"><button class="btn">Request appointment</button></div>
+        </form>
+        <div class="done" id="book-done" hidden>✅ <b>Request sent!</b> We'll call you within one business day to confirm your time.</div>
+      </div>
+    </section>
+
+    <!-- CONTACT -->
+    <section class="panel" id="p-contact" hidden>
+      <div class="wrap">
+        <h2>Contact</h2>
+        <div class="grid">
+          <div class="card"><div class="emoji">📞</div><h3>Call or text</h3><p>(512) 555-0162</p></div>
+          <div class="card"><div class="emoji">✉️</div><h3>Email</h3><p>hello@pawpawcreek.example</p></div>
+          <div class="card"><div class="emoji">🚨</div><h3>After-hours emergency</h3><p>(512) 555-0199, answered 24/7</p></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- COMING SOON (where most links go) -->
+    <section class="panel soon" id="p-soon" hidden>
+      <div class="wrap">
+        <div class="emoji">🚧</div>
+        <h2>Pawsibly coming soon!</h2>
+        <p class="lead" style="margin-inline:auto">This part of our digital journey is still being reimagined. In the meantime, feel free to Discover more Solutions.</p>
+      </div>
+    </section>
+  </main>
+
+  <!-- ============ Footer: a third menu, with yet more labels ============ -->
+  <footer>
+    <div class="wrap">
+      <div class="fgrid">
+        <div><b>Pawpaw Creek</b>Appointments are available through our Solutions.</div>
+        <div><b>Navigate</b><a data-go="home">Start</a><a data-go="services">Offerings</a><a data-go="hours">Timing?</a><a data-go="soon">Reach</a><a data-go="soon">Stuff</a></div>
+        <div><b>Elsewhere</b><a data-go="soon">Portal</a><a data-go="soon">Sitemap</a><a data-go="soon">More</a></div>
+      </div>
+      <p class="fine">Pawpaw Creek Animal Clinic is a fictional business in Bastrop, Texas. This demo site shows what confusing navigation looks like.</p>
+    </div>
+  </footer>
+
+<script>
+  // Everything below "works". It just doesn't help. Demo only.
+
+  const panels = document.querySelectorAll('.panel');
+
+  // Swap "pages" without touching the URL, so Back leaves the site.
+  function go(id) {
+    panels.forEach(p => (p.hidden = p.id !== 'p-' + id));
+    document.querySelectorAll('.mega li.open').forEach(li => li.classList.remove('open'));
+    closeDrawer();
+    window.scrollTo(0, 0);
+  }
+  document.addEventListener('click', e => {
+    const link = e.target.closest('[data-go]');
+    if (!link) return;
+    e.preventDefault();
+    go(link.dataset.go);
+  });
+
+  // Hover-only mega menu. No delay: slip off by one pixel and it's gone.
+  document.querySelectorAll('.mega li').forEach(li => {
+    if (!li.querySelector(':scope > .sub')) return;
+    li.addEventListener('mouseenter', () => li.classList.add('open'));
+    li.addEventListener('mouseleave', () => li.classList.remove('open'));
+  });
+
+  // Drawer: submenus only open from the tiny caret. Tap the label and you leave.
+  function openDrawer() { document.body.classList.add('drawer-open'); }
+  function closeDrawer() { document.body.classList.remove('drawer-open'); }
+  document.querySelectorAll('.drawer .caret').forEach(c =>
+    c.addEventListener('click', () => c.closest('li').classList.toggle('open'))
+  );
+
+  document.getElementById('book-form').addEventListener('submit', e => {
+    e.preventDefault();
+    e.target.hidden = true;
+    document.getElementById('book-done').hidden = false;
+  });
+</script>
+
+</body>
+</html>
