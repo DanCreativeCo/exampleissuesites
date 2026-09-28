@@ -1,0 +1,297 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Chill Armadillo Air &amp; Heat</title>
+<style>
+  /* ============================================================
+     INTENTIONALLY BAD CONTACT INFO — DEMO ONLY
+     The site looks fine. Actually reaching the business does not:
+       - phone number only appears inside a picture (painted on the van, drawn in SVG)
+       - the other copy of the number is tiny, low-contrast, canvas-drawn text in the footer
+       - no tap-to-call anywhere: nothing can be tapped, selected, or copied
+       - "Call Now" buttons are really links to the contact form
+       - hours say "Call for hours" (with what number?)
+       - address is only a static picture of a map, no text, no link
+       - email obfuscated as "service [at] ... [dot] ..."
+       - social icons offered as the main way to get in touch
+       - contact section buried at the very bottom, after the long "Our Story" copy
+       - the form has 15 required fields plus a CAPTCHA puzzle
+       - submitting promises a reply in 3–5 business days (it's 104°F)
+     ============================================================ */
+
+  *, *::before, *::after { box-sizing: border-box; }
+
+  :root {
+    --navy: #0f2a44;
+    --blue: #1d6fb8;
+    --ice: #eaf5fc;
+    --frost: #ffffff;
+    --sun: #f26b1d;
+    --ink: #13212f;
+    --muted: #5b6b7a;
+    --line: #d4e6f3;
+  }
+
+  html { scroll-behavior: smooth; }
+  body {
+    margin: 0;
+    font-family: "Trebuchet MS", "Segoe UI", sans-serif;
+    background: var(--ice);
+    color: var(--ink);
+  }
+
+  .wrap { max-width: 1100px; margin: 0 auto; padding-inline: clamp(16px, 5vw, 48px); }
+  h2 { font-size: clamp(28px, 4vw, 40px); margin: 0 0 20px; }
+  section { padding: clamp(48px, 8vw, 72px) 0; scroll-margin-top: 68px; }
+
+  /* ---------- Header ---------- */
+  .topbar { background: var(--frost); border-bottom: 1px solid var(--line); position: sticky; top: 0; z-index: 20; }
+  .topbar .wrap { display: flex; align-items: center; gap: 24px; min-height: 68px; }
+  .logo { font-weight: bold; font-size: 20px; color: var(--navy); margin-right: auto; line-height: 1.1; }
+  .logo span { color: var(--blue); }
+  .nav { display: flex; gap: 22px; }
+  .nav a { color: var(--ink); text-decoration: none; }
+  @media (max-width: 760px) { .nav { display: none; } }
+  .btn {
+    display: inline-block; background: var(--sun); color: #fff; text-decoration: none; text-align: center;
+    padding: 13px 24px; border-radius: 999px; font-weight: bold; font-size: 17px; border: 0; cursor: pointer;
+  }
+  .btn.ghost { background: transparent; color: var(--navy); border: 2px solid var(--navy); }
+
+  /* ---------- Hero ---------- */
+  .hero { background: radial-gradient(circle at 85% 20%, #ffd9b8, var(--ice) 55%); }
+  .hero .wrap { display: grid; grid-template-columns: 1.1fr 1fr; gap: 32px; align-items: center; }
+  @media (max-width: 800px) { .hero .wrap { grid-template-columns: 1fr; } }
+  .temp { display: inline-block; background: #fff; border: 1px solid #ffd2b0; color: var(--sun); font-weight: bold; padding: 6px 14px; border-radius: 999px; font-size: 15px; }
+  .hero h1 { font-size: clamp(36px, 6.5vw, 64px); line-height: 1.05; margin: 16px 0; }
+  .hero p { font-size: clamp(17px, 2vw, 20px); line-height: 1.5; color: var(--muted); margin: 0 0 24px; max-width: 36ch; }
+  .actions { display: flex; flex-wrap: wrap; gap: 12px; }
+  .van { width: 100%; max-width: 480px; height: auto; display: block; margin-inline: auto; }
+
+  /* ---------- Content ---------- */
+  .story p { line-height: 1.75; max-width: 70ch; color: var(--muted); }
+  .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 20px; }
+  .card { background: var(--frost); border: 1px solid var(--line); border-radius: 14px; padding: 22px; }
+  .card .emoji { font-size: 38px; }
+  .card h3 { margin: 10px 0 6px; }
+  .card p { margin: 0; color: var(--muted); line-height: 1.5; }
+  .services { background: var(--frost); }
+  .review q { display: block; font-size: 17px; line-height: 1.5; margin-bottom: 10px; }
+  .review .stars { color: var(--sun); letter-spacing: 2px; }
+
+  footer { background: var(--navy); color: #9fb6cc; font-size: 14px; padding: 28px 0 36px; line-height: 1.6; }
+
+  /* ============================================================
+     THE BAD STUFF
+     ============================================================ */
+  .van text { user-select: none; -webkit-user-select: none; pointer-events: none; }   /* it's "just an image" */
+
+  .social-only { display: flex; align-items: center; gap: 10px; font-size: 14px; color: var(--muted); flex-wrap: wrap; }
+  .social-only a {
+    width: 36px; height: 36px; border-radius: 50%; display: grid; place-items: center; text-decoration: none;
+    color: #fff; font-weight: bold; font-size: 15px; background: var(--blue);
+  }
+
+  .visit .wrap { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 32px; align-items: start; }
+  .visit p { line-height: 1.7; margin: 0 0 12px; }
+  .map { border-radius: 14px; overflow: hidden; border: 1px solid var(--line); display: block; }
+  .map svg { display: block; width: 100%; height: auto; }
+  .obfuscated { font-family: monospace; font-size: 14px; color: var(--muted); }
+
+  .contact { background: var(--frost); }
+  .contact .intro { color: var(--muted); max-width: 60ch; line-height: 1.6; }
+  .form-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 14px 18px; margin: 24px 0; }
+  .form-grid label { display: block; font-size: 14px; font-weight: bold; }
+  .form-grid label small { font-weight: normal; color: var(--muted); }
+  .form-grid input, .form-grid select, .form-grid textarea {
+    width: 100%; margin-top: 6px; padding: 12px; font: inherit; font-size: 16px; border: 1px solid #b9cfe0; border-radius: 8px; background: #fff;
+  }
+  .form-grid .full { grid-column: 1 / -1; }
+  .req { color: #c62828; }
+  .captcha { border: 2px dashed #b9cfe0; border-radius: 12px; padding: 16px; max-width: 360px; }
+  .captcha p { margin: 0 0 10px; font-size: 14px; }
+  .tiles { display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px; }
+  .tiles button { font-size: 30px; aspect-ratio: 1; border: 2px solid #dfe9f1; border-radius: 8px; background: #f5f9fc; cursor: pointer; }
+  .tiles button.on { border-color: var(--blue); background: #d6ebfa; }
+  .fine { font-size: 12px; color: var(--muted); margin-top: 10px; }
+  .result { display: none; margin-top: 18px; padding: 18px; border-radius: 12px; background: #fff4e5; border: 1px solid #ffd2b0; font-size: 17px; line-height: 1.5; }
+  .result.show { display: block; }
+  #footer-phone { display: block; margin-top: 6px; }
+</style>
+</head>
+<body>
+
+  <div class="topbar">
+    <div class="wrap">
+      <div class="logo">❄️ Chill <span>Armadillo</span><br><small style="font-weight:normal;font-size:12px;color:var(--muted)">Air &amp; Heat &middot; Bastrop, TX</small></div>
+      <nav class="nav">
+        <a href="#services">Services</a>
+        <a href="#reviews">Reviews</a>
+        <a href="#visit">Visit</a>
+        <a href="#contact">Contact</a>
+      </nav>
+      <a class="btn" href="#contact">📞 Call Now</a>   <!-- not a phone link. it's the form. -->
+    </div>
+  </div>
+
+  <section class="hero">
+    <div class="wrap">
+      <div>
+        <span class="temp">🌡️ 104°F in Bastrop right now</span>
+        <h1>AC out? We'll have you chill by tonight.</h1>
+        <p>Family-owned heating &amp; air repair serving Bastrop County since 1998. Same-day service, honest prices, and a very cool armadillo.</p>
+        <div class="actions">
+          <a class="btn" href="#contact">📞 Call Now</a>
+          <a class="btn ghost" href="#contact">Book a Repair</a>
+        </div>
+        <div class="social-only" style="margin-top:22px">
+          Questions? Slide into our DMs!
+          <a href="#" aria-label="Facebook">f</a><a href="#" aria-label="Instagram">◎</a><a href="#" aria-label="TikTok">♪</a>
+        </div>
+      </div>
+      <!-- The ONLY readable phone number on the page... painted on a picture of the van. -->
+      <svg class="van" viewBox="0 0 480 280" role="img" aria-label="Our service van">
+        <ellipse cx="240" cy="258" rx="210" ry="12" fill="#0f2a44" opacity=".12"/>
+        <path d="M40 90 Q40 60 70 60 H320 L400 120 Q430 125 440 150 V220 H40 Z" fill="#fff" stroke="#0f2a44" stroke-width="4"/>
+        <path d="M325 72 L388 122 H325 Z" fill="#bfe3fa" stroke="#0f2a44" stroke-width="3"/>
+        <rect x="40" y="190" width="400" height="30" fill="#1d6fb8"/>
+        <circle cx="120" cy="228" r="30" fill="#13212f"/><circle cx="120" cy="228" r="12" fill="#ccd"/>
+        <circle cx="360" cy="228" r="30" fill="#13212f"/><circle cx="360" cy="228" r="12" fill="#ccd"/>
+        <text x="70" y="112" font-size="24" font-weight="bold" fill="#0f2a44" font-family="Trebuchet MS, sans-serif">❄️ CHILL ARMADILLO</text>
+        <text x="72" y="140" font-size="16" fill="#1d6fb8" font-family="Trebuchet MS, sans-serif">Air &amp; Heat · Bastrop, TX</text>
+        <text x="190" y="176" font-size="13" fill="#f26b1d" font-style="italic" font-family="Georgia, serif" transform="rotate(-4 250 172)">Call (512) 555-0182</text>
+      </svg>
+    </div>
+  </section>
+
+  <section class="story">
+    <div class="wrap">
+      <h2>Our Story</h2>
+      <p>It all started in the summer of 1998, when founder Earl "Armadillo" Pruitt's own window unit gave out during a family reunion. Forty-two relatives, one ceiling fan, and a potato salad situation nobody talks about anymore. Earl swore that day that no family in Bastrop County would ever sweat through a reunion again.</p>
+      <p>Since then, we've grown from one pickup truck and a borrowed set of gauges into a team of eleven certified technicians. We believe comfort is a lifestyle, not just a temperature. We believe in the quiet dignity of a well-sealed duct. We believe that every compressor has a story, and that every story deserves to be heard, ideally before the capacitor fails.</p>
+      <p>Our philosophy is simple: treat every home like it's our own, every customer like family, and every thermostat like a close personal friend. Whether it's a quick tune-up, a full system replacement, or an emergency call at 2&nbsp;a.m., we bring the same Chill Armadillo commitment to quality, integrity, and cool, crisp air. We also sponsor a Little League team. Go Armadillos.</p>
+    </div>
+  </section>
+
+  <section class="services" id="services">
+    <div class="wrap">
+      <h2>What we fix</h2>
+      <div class="grid">
+        <div class="card"><div class="emoji">❄️</div><h3>AC repair</h3><p>Warm air, weird noises, frozen lines, dead capacitors. All makes and models.</p></div>
+        <div class="card"><div class="emoji">🔧</div><h3>Tune-ups</h3><p>Spring and fall check-ups so your system doesn't quit on the hottest day of the year.</p></div>
+        <div class="card"><div class="emoji">🏠</div><h3>New systems</h3><p>High-efficiency installs with upfront pricing and financing options.</p></div>
+        <div class="card"><div class="emoji">🔥</div><h3>Heating</h3><p>Furnaces and heat pumps, for the three cold days Texas gets each year.</p></div>
+      </div>
+    </div>
+  </section>
+
+  <section id="reviews">
+    <div class="wrap">
+      <h2>What neighbors say</h2>
+      <div class="grid">
+        <div class="card review"><div class="stars">★★★★★</div><q>Great tech, fixed it in an hour. Finding their phone number took longer than the repair.</q><b>Dana R.</b></div>
+        <div class="card review"><div class="stars">★★☆☆☆</div><q>Pressed "Call Now." It gave me a form. With a CAPTCHA. While sweating.</q><b>Marcus T.</b></div>
+        <div class="card review"><div class="stars">★★★★☆</div><q>Ended up zooming in on a photo of their van like a detective. Good service though.</q><b>Priya S.</b></div>
+      </div>
+    </div>
+  </section>
+
+  <section class="visit" id="visit">
+    <div class="wrap">
+      <div>
+        <h2>Visit us</h2>
+        <p><b>Hours:</b> Call for hours</p>
+        <p><b>Email:</b> <span class="obfuscated">service [at] chillarmadillo [dot] example</span></p>
+        <div class="social-only">Or message us on social! <a href="#" aria-label="Facebook">f</a><a href="#" aria-label="Instagram">◎</a><a href="#" aria-label="TikTok">♪</a></div>
+      </div>
+      <!-- A picture of a map. No address, no link, no directions. -->
+      <div class="map" aria-hidden="true">
+        <svg viewBox="0 0 400 240">
+          <rect width="400" height="240" fill="#eef3e6"/>
+          <path d="M-10 190 C 80 150, 140 230, 230 180 S 360 120, 410 150" stroke="#9cc9ea" stroke-width="22" fill="none"/>
+          <path d="M0 70 H400 M0 130 H400 M90 0 V240 M210 0 V240 M320 0 V240" stroke="#fff" stroke-width="10"/>
+          <path d="M0 70 H400 M90 0 V240 M210 0 V240" stroke="#f5d78a" stroke-width="4"/>
+          <rect x="110" y="84" width="80" height="34" fill="#d8e6cd"/><rect x="230" y="14" width="70" height="44" fill="#d8e6cd"/>
+          <rect x="336" y="84" width="54" height="34" fill="#dcdcdc"/><rect x="20" y="84" width="56" height="34" fill="#dcdcdc"/>
+          <path d="M262 112 c-14 0 -24 -10 -24 -24 c0 -18 24 -40 24 -40 s24 22 24 40 c0 14 -10 24 -24 24z" fill="#e53935" stroke="#fff" stroke-width="3"/>
+          <circle cx="262" cy="86" r="8" fill="#fff"/>
+        </svg>
+      </div>
+    </div>
+  </section>
+
+  <section class="contact" id="contact">
+    <div class="wrap">
+      <h2>Contact Us</h2>
+      <p class="intro">We'd love to hear from you! To better serve you, please complete <b>all fields</b> below so a Comfort Specialist can review your request. Please do not call.</p>
+      <form id="form" novalidate>
+        <div class="form-grid">
+          <label>First name <span class="req">*</span><input required></label>
+          <label>Last name <span class="req">*</span><input required></label>
+          <label>Email <span class="req">*</span><input type="email" required></label>
+          <label>Confirm email <span class="req">*</span><input type="email" required></label>
+          <label>Phone <span class="req">*</span> <small>(we'll email you)</small><input type="tel" required></label>
+          <label>Fax <span class="req">*</span><input type="tel" required></label>
+          <label>Street address <span class="req">*</span><input required></label>
+          <label>City <span class="req">*</span><input required></label>
+          <label>ZIP <span class="req">*</span><input inputmode="numeric" required></label>
+          <label>Date of birth <span class="req">*</span><input type="date" required></label>
+          <label>AC brand <span class="req">*</span><select required><option>Select…</option><option>Carrier</option><option>Trane</option><option>Lennox</option><option>No idea, it's in the attic</option></select></label>
+          <label>Model number <span class="req">*</span><input required></label>
+          <label>Serial number <span class="req">*</span> <small>(on the unit, on the roof)</small><input required></label>
+          <label>How did you hear about us? <span class="req">*</span><select required><option>Select…</option><option>Our van</option><option>A friend</option><option>Desperation</option></select></label>
+          <label class="full">Describe the problem <span class="req">*</span> <small>(minimum 500 characters)</small><textarea rows="5" required></textarea></label>
+        </div>
+        <div class="captcha">
+          <p><b>Verify you're human:</b> select every square with an air conditioner.</p>
+          <div class="tiles" id="tiles">
+            <button type="button">🧊</button><button type="button">🌀</button><button type="button">📦</button>
+            <button type="button">❄️</button><button type="button">🏠</button><button type="button">🌵</button>
+            <button type="button">🥵</button><button type="button">🔲</button><button type="button">🦔</button>
+          </div>
+        </div>
+        <p style="margin-top:20px"><button class="btn" type="submit">Submit Request</button></p>
+        <p class="fine">By submitting you agree to receive our monthly newsletter, "Duct Tales."</p>
+        <div class="result" id="result">✅ <b>Thanks!</b> A Comfort Specialist will get back to you in <b>3–5 business days</b>.<br>Stay cool out there! 🥵</div>
+      </form>
+    </div>
+  </section>
+
+  <footer>
+    <div class="wrap">
+      &copy; 2026 Chill Armadillo Air &amp; Heat &middot; Licensed &amp; insured
+      <canvas id="footer-phone" width="150" height="14" aria-hidden="true"></canvas>
+      Chill Armadillo Air &amp; Heat is a fictional business. This demo site shows contact info that's hidden and hard to use.
+    </div>
+  </footer>
+
+<script>
+  // Everything below makes getting in touch harder. Demo only.
+
+  // The footer phone number is drawn on a canvas: tiny, dim, and impossible to tap, select, or copy.
+  const c = document.getElementById('footer-phone');
+  const dpr = window.devicePixelRatio || 1;
+  c.width = 150 * dpr; c.height = 14 * dpr;
+  c.style.width = '150px'; c.style.height = '14px';
+  const ctx = c.getContext('2d');
+  ctx.scale(dpr, dpr);
+  ctx.font = '9px "Trebuchet MS", sans-serif';
+  ctx.fillStyle = '#3f5a75';
+  ctx.fillText('ph. (512) 555-0182', 0, 10);
+
+  // CAPTCHA tiles toggle. None of them is really an AC unit.
+  document.querySelectorAll('#tiles button').forEach(b => b.onclick = () => b.classList.toggle('on'));
+
+  // Submitting does... this.
+  document.getElementById('form').addEventListener('submit', e => {
+    e.preventDefault();
+    const r = document.getElementById('result');
+    r.classList.add('show');
+    r.scrollIntoView({ behavior: 'smooth', block: 'center' });
+  });
+</script>
+
+</body>
+</html>

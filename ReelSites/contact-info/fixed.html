@@ -1,0 +1,285 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Chill Armadillo Air &amp; Heat</title>
+<style>
+  /* ============================================================
+     FIXED VERSION: same AC company as index.html, but you can actually reach them
+       - phone number is real text in the header, and every "Call" button is a tel: link
+       - 24/7 emergency line in a strip at the very top
+       - sticky Call / Text / Directions bar on phones (tel:, sms:, maps link)
+       - "Text us" sms: link for people who'd rather send a photo of the unit
+       - contact card with phone, hours, address, and email above the fold
+       - real hours listed, including the emergency line
+       - address is text, and the map picture links to directions
+       - email is a plain mailto: link
+       - contact section moved up, right after services
+       - short 3-field form with an honest callback time (15 minutes)
+       - social icons are extras, not the only way in
+     ============================================================ */
+
+  *, *::before, *::after { box-sizing: border-box; }
+
+  :root {
+    --navy: #0f2a44;
+    --blue: #1d6fb8;
+    --ice: #eaf5fc;
+    --frost: #ffffff;
+    --sun: #f26b1d;
+    --ink: #13212f;
+    --muted: #5b6b7a;
+    --line: #d4e6f3;
+  }
+
+  html { scroll-behavior: smooth; }
+  body {
+    margin: 0;
+    font-family: "Trebuchet MS", "Segoe UI", sans-serif;
+    background: var(--ice);
+    color: var(--ink);
+  }
+
+  .wrap { max-width: 1100px; margin: 0 auto; padding-inline: clamp(16px, 5vw, 48px); }
+  h2 { font-size: clamp(28px, 4vw, 40px); margin: 0 0 20px; }
+  section { padding: clamp(48px, 8vw, 72px) 0; scroll-margin-top: 68px; }
+
+  /* ---------- Header ---------- */
+  .topbar { background: var(--frost); border-bottom: 1px solid var(--line); position: sticky; top: 0; z-index: 20; }
+  .topbar .wrap { display: flex; align-items: center; gap: 24px; min-height: 68px; }
+  .logo { font-weight: bold; font-size: 20px; color: var(--navy); margin-right: auto; line-height: 1.1; }
+  .logo span { color: var(--blue); }
+  .nav { display: flex; gap: 22px; }
+  .nav a { color: var(--ink); text-decoration: none; }
+  @media (max-width: 760px) { .nav { display: none; } }
+  .btn {
+    display: inline-block; background: var(--sun); color: #fff; text-decoration: none; text-align: center;
+    padding: 13px 24px; border-radius: 999px; font-weight: bold; font-size: 17px; border: 0; cursor: pointer;
+  }
+  .btn.ghost { background: transparent; color: var(--navy); border: 2px solid var(--navy); }
+
+  /* ---------- Hero ---------- */
+  .hero { background: radial-gradient(circle at 85% 20%, #ffd9b8, var(--ice) 55%); }
+  .hero .wrap { display: grid; grid-template-columns: 1.1fr 1fr; gap: 32px; align-items: center; }
+  @media (max-width: 800px) { .hero .wrap { grid-template-columns: 1fr; } }
+  .temp { display: inline-block; background: #fff; border: 1px solid #ffd2b0; color: var(--sun); font-weight: bold; padding: 6px 14px; border-radius: 999px; font-size: 15px; }
+  .hero h1 { font-size: clamp(36px, 6.5vw, 64px); line-height: 1.05; margin: 16px 0; }
+  .hero p { font-size: clamp(17px, 2vw, 20px); line-height: 1.5; color: var(--muted); margin: 0 0 24px; max-width: 36ch; }
+  .actions { display: flex; flex-wrap: wrap; gap: 12px; }
+  .van { width: 100%; max-width: 480px; height: auto; display: block; margin-inline: auto; }
+
+  /* ---------- Content ---------- */
+  .story p { line-height: 1.75; max-width: 70ch; color: var(--muted); }
+  .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 20px; }
+  .card { background: var(--frost); border: 1px solid var(--line); border-radius: 14px; padding: 22px; }
+  .card .emoji { font-size: 38px; }
+  .card h3 { margin: 10px 0 6px; }
+  .card p { margin: 0; color: var(--muted); line-height: 1.5; }
+  .services { background: var(--frost); }
+  .review q { display: block; font-size: 17px; line-height: 1.5; margin-bottom: 10px; }
+  .review .stars { color: var(--sun); letter-spacing: 2px; }
+
+  footer { background: var(--navy); color: #9fb6cc; font-size: 14px; padding: 28px 0 36px; line-height: 1.6; }
+  footer a { color: #fff; }
+
+  /* ============================================================
+     THE FIXES
+     ============================================================ */
+  .emergency { background: var(--navy); color: #fff; text-align: center; font-size: 15px; padding: 9px 16px; }
+  .emergency a { color: #ffb27a; font-weight: bold; white-space: nowrap; }
+
+  .header-phone { white-space: nowrap; }
+  .header-phone .short { display: none; }
+  @media (max-width: 420px) { .header-phone { padding: 11px 16px; font-size: 16px; } .logo { font-size: 18px; } .topbar .wrap { gap: 12px; } }
+
+  .quick { margin-top: 26px; background: #fff; border: 1px solid var(--line); border-radius: 14px; padding: 16px 18px; max-width: 460px; }
+  .quick ul { list-style: none; margin: 0; padding: 0; display: grid; gap: 8px; font-size: 16px; }
+  .quick a { color: var(--blue); font-weight: bold; }
+
+  .contact { background: var(--ice); }
+  .contact .wrap { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 32px; align-items: start; }
+  .contact p { line-height: 1.7; margin: 0 0 12px; }
+  .contact a { color: var(--blue); font-weight: bold; }
+  .hours { width: 100%; border-collapse: collapse; margin: 6px 0 18px; font-size: 16px; }
+  .hours td { padding: 7px 0; border-bottom: 1px solid var(--line); }
+  .hours td:last-child { text-align: right; }
+  .hours tr.urgent td { color: var(--sun); font-weight: bold; }
+  .map { border-radius: 14px; overflow: hidden; border: 1px solid var(--line); display: block; margin-bottom: 12px; }
+  .map svg { display: block; width: 100%; height: auto; }
+
+  .short-form { background: var(--frost); border: 1px solid var(--line); border-radius: 14px; padding: 22px; }
+  .short-form h3 { margin: 0 0 4px; font-size: 22px; }
+  .short-form label { display: block; font-size: 14px; font-weight: bold; margin-top: 12px; }
+  .short-form input, .short-form textarea {
+    width: 100%; margin-top: 6px; padding: 12px; font: inherit; font-size: 16px; border: 1px solid #b9cfe0; border-radius: 8px;
+  }
+  .short-form .btn { width: 100%; margin-top: 16px; }
+  .result { display: none; margin-top: 14px; padding: 14px; border-radius: 10px; background: #e7f6ec; border: 1px solid #b5e0c3; line-height: 1.5; }
+  .result.show { display: block; }
+
+  .socials { display: flex; gap: 10px; margin-top: 8px; }
+  .socials a { width: 34px; height: 34px; border-radius: 50%; display: grid; place-items: center; text-decoration: none; color: #fff; background: var(--blue); font-size: 14px; }
+
+  /* Sticky tap-to-call bar on phones */
+  .callbar { display: none; }
+  @media (max-width: 800px) {
+    body { padding-bottom: 74px; }
+    .header-phone .num { display: none; }
+    .header-phone .short { display: inline; }
+    .callbar {
+      display: grid; grid-template-columns: 1.3fr 1fr 1fr; gap: 8px; position: fixed; left: 0; right: 0; bottom: 0; z-index: 30;
+      background: var(--frost); border-top: 1px solid var(--line); padding: 10px 12px calc(10px + env(safe-area-inset-bottom));
+      box-shadow: 0 -6px 20px rgba(15, 42, 68, .12);
+    }
+    .callbar a { text-align: center; text-decoration: none; font-weight: bold; font-size: 16px; padding: 13px 6px; border-radius: 12px; background: var(--ice); color: var(--navy); }
+    .callbar a.call { background: var(--sun); color: #fff; }
+  }
+</style>
+</head>
+<body>
+
+  <div class="emergency">🚨 AC out? 24/7 emergency line: <a href="tel:+15125550199">(512) 555-0199</a></div>
+
+  <div class="topbar">
+    <div class="wrap">
+      <div class="logo">❄️ Chill <span>Armadillo</span><br><small style="font-weight:normal;font-size:12px;color:var(--muted)">Air &amp; Heat &middot; Bastrop, TX</small></div>
+      <nav class="nav">
+        <a href="#services">Services</a>
+        <a href="#contact">Hours &amp; Location</a>
+        <a href="#reviews">Reviews</a>
+      </nav>
+      <a class="btn header-phone" href="tel:+15125550182">📞 <span class="num">(512) 555-0182</span><span class="short">Call</span></a>
+    </div>
+  </div>
+
+  <section class="hero">
+    <div class="wrap">
+      <div>
+        <span class="temp">🌡️ 104°F in Bastrop right now</span>
+        <h1>AC out? We'll have you chill by tonight.</h1>
+        <p>Family-owned heating &amp; air repair serving Bastrop County since 1998. Same-day service, honest prices, and a very cool armadillo.</p>
+        <div class="actions">
+          <a class="btn" href="tel:+15125550182">📞 Call (512) 555-0182</a>
+          <a class="btn ghost" href="sms:+15125550182">💬 Text us</a>
+        </div>
+        <div class="quick">
+          <ul>
+            <li>🕗 <b>Mon–Fri 7am–7pm</b>, Sat 8am–4pm</li>
+            <li>🚨 24/7 emergencies: <a href="tel:+15125550199">(512) 555-0199</a></li>
+            <li>📍 <a href="https://www.google.com/maps/search/?api=1&amp;query=1207+Loblolly+Loop+Bastrop+TX+78602">1207 Loblolly Loop, Bastrop</a></li>
+          </ul>
+        </div>
+      </div>
+      <svg class="van" viewBox="0 0 480 280" role="img" aria-label="Chill Armadillo service van">
+        <ellipse cx="240" cy="258" rx="210" ry="12" fill="#0f2a44" opacity=".12"/>
+        <path d="M40 90 Q40 60 70 60 H320 L400 120 Q430 125 440 150 V220 H40 Z" fill="#fff" stroke="#0f2a44" stroke-width="4"/>
+        <path d="M325 72 L388 122 H325 Z" fill="#bfe3fa" stroke="#0f2a44" stroke-width="3"/>
+        <rect x="40" y="190" width="400" height="30" fill="#1d6fb8"/>
+        <circle cx="120" cy="228" r="30" fill="#13212f"/><circle cx="120" cy="228" r="12" fill="#ccd"/>
+        <circle cx="360" cy="228" r="30" fill="#13212f"/><circle cx="360" cy="228" r="12" fill="#ccd"/>
+        <text x="70" y="112" font-size="24" font-weight="bold" fill="#0f2a44" font-family="Trebuchet MS, sans-serif">❄️ CHILL ARMADILLO</text>
+        <text x="72" y="140" font-size="16" fill="#1d6fb8" font-family="Trebuchet MS, sans-serif">Air &amp; Heat · Bastrop, TX</text>
+        <text x="190" y="176" font-size="13" fill="#f26b1d" font-style="italic" font-family="Georgia, serif" transform="rotate(-4 250 172)">Call (512) 555-0182</text>
+      </svg>
+    </div>
+  </section>
+
+  <section class="services" id="services">
+    <div class="wrap">
+      <h2>What we fix</h2>
+      <div class="grid">
+        <div class="card"><div class="emoji">❄️</div><h3>AC repair</h3><p>Warm air, weird noises, frozen lines, dead capacitors. All makes and models.</p></div>
+        <div class="card"><div class="emoji">🔧</div><h3>Tune-ups</h3><p>Spring and fall check-ups so your system doesn't quit on the hottest day of the year.</p></div>
+        <div class="card"><div class="emoji">🏠</div><h3>New systems</h3><p>High-efficiency installs with upfront pricing and financing options.</p></div>
+        <div class="card"><div class="emoji">🔥</div><h3>Heating</h3><p>Furnaces and heat pumps, for the three cold days Texas gets each year.</p></div>
+      </div>
+    </div>
+  </section>
+
+  <section class="contact" id="contact">
+    <div class="wrap">
+      <div>
+        <h2>Hours &amp; location</h2>
+        <table class="hours">
+          <tr><td>Mon – Fri</td><td>7 a.m. – 7 p.m.</td></tr>
+          <tr><td>Saturday</td><td>8 a.m. – 4 p.m.</td></tr>
+          <tr><td>Sunday</td><td>Emergency calls only</td></tr>
+          <tr class="urgent"><td>🚨 Emergency line</td><td>24/7</td></tr>
+        </table>
+        <p>📞 Office: <a href="tel:+15125550182">(512) 555-0182</a><br>
+           🚨 Emergency: <a href="tel:+15125550199">(512) 555-0199</a><br>
+           💬 Text a photo of your unit: <a href="sms:+15125550182">(512) 555-0182</a><br>
+           ✉️ <a href="mailto:service@chillarmadillo.example">service@chillarmadillo.example</a></p>
+        <a class="map" href="https://www.google.com/maps/search/?api=1&amp;query=1207+Loblolly+Loop+Bastrop+TX+78602" aria-label="Get directions to 1207 Loblolly Loop, Bastrop, TX">
+          <svg viewBox="0 0 400 240" aria-hidden="true">
+            <rect width="400" height="240" fill="#eef3e6"/>
+            <path d="M-10 190 C 80 150, 140 230, 230 180 S 360 120, 410 150" stroke="#9cc9ea" stroke-width="22" fill="none"/>
+            <path d="M0 70 H400 M0 130 H400 M90 0 V240 M210 0 V240 M320 0 V240" stroke="#fff" stroke-width="10"/>
+            <path d="M0 70 H400 M90 0 V240 M210 0 V240" stroke="#f5d78a" stroke-width="4"/>
+            <rect x="110" y="84" width="80" height="34" fill="#d8e6cd"/><rect x="230" y="14" width="70" height="44" fill="#d8e6cd"/>
+            <rect x="336" y="84" width="54" height="34" fill="#dcdcdc"/><rect x="20" y="84" width="56" height="34" fill="#dcdcdc"/>
+            <path d="M262 112 c-14 0 -24 -10 -24 -24 c0 -18 24 -40 24 -40 s24 22 24 40 c0 14 -10 24 -24 24z" fill="#e53935" stroke="#fff" stroke-width="3"/>
+            <circle cx="262" cy="86" r="8" fill="#fff"/>
+          </svg>
+        </a>
+        <p>📍 1207 Loblolly Loop, Bastrop, TX 78602 &middot; <a href="https://www.google.com/maps/search/?api=1&amp;query=1207+Loblolly+Loop+Bastrop+TX+78602">Get directions</a></p>
+      </div>
+
+      <form class="short-form" id="form">
+        <h3>Rather we call you?</h3>
+        <p style="color:var(--muted);margin:0">Three quick fields. We call back within 15 minutes during business hours.</p>
+        <label>Name<input name="name" autocomplete="name" required></label>
+        <label>Phone<input name="phone" type="tel" autocomplete="tel" required></label>
+        <label>What's going on? <small style="font-weight:normal;color:var(--muted)">(optional)</small><textarea name="issue" rows="3" placeholder="e.g. blowing warm air since this morning"></textarea></label>
+        <button class="btn" type="submit">Request a callback</button>
+        <div class="result" id="result" role="status">✅ <b>Got it!</b> A tech will call you within 15 minutes. Can't wait? <a href="tel:+15125550182">Call (512) 555-0182</a>.</div>
+        <div class="socials" aria-label="Social media"><a href="#" aria-label="Facebook">f</a><a href="#" aria-label="Instagram">◎</a><a href="#" aria-label="TikTok">♪</a></div>
+      </form>
+    </div>
+  </section>
+
+  <section id="reviews">
+    <div class="wrap">
+      <h2>What neighbors say</h2>
+      <div class="grid">
+        <div class="card review"><div class="stars">★★★★★</div><q>Called at 9 p.m., a real person picked up, and we had cold air by 11.</q><b>Dana R.</b></div>
+        <div class="card review"><div class="stars">★★★★★</div><q>Tapped the call button, tech was in my driveway that afternoon. No forms.</q><b>Marcus T.</b></div>
+        <div class="card review"><div class="stars">★★★★★</div><q>Texted them a photo of my unit and had a quote in ten minutes.</q><b>Priya S.</b></div>
+      </div>
+    </div>
+  </section>
+
+  <section class="story">
+    <div class="wrap">
+      <h2>Our Story</h2>
+      <p>It all started in the summer of 1998, when founder Earl "Armadillo" Pruitt's own window unit gave out during a family reunion. Forty-two relatives, one ceiling fan, and a potato salad situation nobody talks about anymore. Earl swore that day that no family in Bastrop County would ever sweat through a reunion again.</p>
+      <p>Since then, we've grown from one pickup truck and a borrowed set of gauges into a team of eleven certified technicians. We believe comfort is a lifestyle, not just a temperature. We believe in the quiet dignity of a well-sealed duct. We believe that every compressor has a story, and that every story deserves to be heard, ideally before the capacitor fails.</p>
+      <p>Our philosophy is simple: treat every home like it's our own, every customer like family, and every thermostat like a close personal friend. Whether it's a quick tune-up, a full system replacement, or an emergency call at 2&nbsp;a.m., we bring the same Chill Armadillo commitment to quality, integrity, and cool, crisp air. We also sponsor a Little League team. Go Armadillos.</p>
+    </div>
+  </section>
+
+  <footer>
+    <div class="wrap">
+      &copy; 2026 Chill Armadillo Air &amp; Heat &middot; Licensed &amp; insured<br>
+      <a href="tel:+15125550182">(512) 555-0182</a> &middot; 24/7: <a href="tel:+15125550199">(512) 555-0199</a> &middot; 1207 Loblolly Loop, Bastrop, TX<br>
+      Chill Armadillo Air &amp; Heat is a fictional business. This demo site shows contact info that's easy to find and use.
+    </div>
+  </footer>
+
+  <nav class="callbar" aria-label="Quick contact">
+    <a class="call" href="tel:+15125550182">📞 Call now</a>
+    <a href="sms:+15125550182">💬 Text</a>
+    <a href="https://www.google.com/maps/search/?api=1&amp;query=1207+Loblolly+Loop+Bastrop+TX+78602">📍 Map</a>
+  </nav>
+
+<script>
+  // Short form: browser validation on, honest confirmation. Demo only, nothing is sent.
+  document.getElementById('form').addEventListener('submit', e => {
+    e.preventDefault();
+    document.getElementById('result').classList.add('show');
+  });
+</script>
+
+</body>
+</html>
